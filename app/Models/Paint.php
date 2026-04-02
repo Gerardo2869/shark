@@ -12,5 +12,10 @@ class Paint extends Model
         'color_type',
         'stock',
         'price',
+        'expiration_date',
+        'finish',
+        'code',
+        'ml',
+        'is_active',
     ];
 }
