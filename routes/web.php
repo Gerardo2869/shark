@@ -11,4 +11,5 @@ Route::get('/paints/create', function () {
     return view('paints.create');
 });
 
-Route::post('/paints', [PaintController::class , 'store']);
+Route::post('/paints', [PaintController::class, 'store']);
+Route::get('/paints', [PaintController::class, 'index']);
