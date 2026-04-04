@@ -66,6 +66,22 @@
             background-color: var(--primary-hover);
         }
 
+        .edit-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-color);
+            background-color: var(--bg-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .edit-btn:hover {
+            background-color: #e5f0fa;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -125,6 +141,7 @@
             border-radius: 18px !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
+
         button.swal2-confirm {
             border-radius: 12px !important;
             padding: 12px 24px !important;
@@ -153,6 +170,7 @@
                         <th>Stock</th>
                         <th>Precio</th>
                         <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -171,10 +189,13 @@
                                     <span class="status-badge status-inactive">Desc.</span>
                                 @endif
                             </td>
+                            <td>
+                                <a href="/paints/{{ $paint->id }}/edit" class="edit-btn">Editar</a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
                                 No hay pinturas registradas en el inventario.
                             </td>
                         </tr>
