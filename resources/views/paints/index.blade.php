@@ -119,6 +119,18 @@
             color: #d93d3b;
             font-weight: 600;
         }
+
+        /* Apple SweetAlert Style */
+        div.swal2-popup {
+            border-radius: 18px !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        }
+        button.swal2-confirm {
+            border-radius: 12px !important;
+            padding: 12px 24px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+        }
     </style>
 </head>
 
@@ -172,6 +184,18 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (session('success'))
+            Swal.fire({
+                title: '¡Completado!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#0071e3'
+            });
+        @endif
+    </script>
 </body>
 
 </html>

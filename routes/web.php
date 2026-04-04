@@ -12,4 +12,6 @@ Route::get('/paints/create', function () {
 });
 
 Route::post('/paints', [PaintController::class, 'store']);
-Route::get('/paints', [PaintController::class, 'index']);
+Route::get('/paints', [PaintController::class, 'index'])->name('paints.index');
+Route::get('/paints/{paint}/edit', [PaintController::class, 'edit'])->name('paints.edit');
+Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');

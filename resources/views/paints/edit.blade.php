@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Pintura</title>
+    <title>Editar Pintura</title>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -180,31 +179,32 @@
         </a>
 
         <div class="header">
-            <h1>Nueva Pintura</h1>
-            <p>Ingresa los detalles para agregar al inventario.</p>
+            <h1>Editar Pintura</h1>
+            <p>Modifica los detalles de la pintura en el inventario.</p>
         </div>
 
-        <form method="POST" action="/paints">
+        <form method="POST" action="/paints/{{ $paint->id }}">
             @csrf
+            @method('PUT')
 
             <div class="form-group">
                 <label for="name">Nombre</label>
-                <input id="name" name="name" type="text" placeholder="Ej. Macragge Blue" required>
+                <input id="name" name="name" type="text" value="{{ $paint->name }}" placeholder="Ej. Macragge Blue" required>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="brand">Marca</label>
-                    <input id="brand" name="brand" type="text" placeholder="Ej. Citadel" required>
+                    <input id="brand" name="brand" type="text" value="{{ $paint->brand }}" placeholder="Ej. Citadel" required>
                 </div>
 
                 <div class="form-group">
                     <label for="color_type">Tipo de Color</label>
                     <select id="color_type" name="color_type" required>
-                        <option value="base">Base</option>
-                        <option value="layer">Layer</option>
-                        <option value="shade">Shade</option>
-                        <option value="dry">Dry</option>
+                        <option value="base" {{ $paint->color_type == 'base' ? 'selected' : '' }}>Base</option>
+                        <option value="layer" {{ $paint->color_type == 'layer' ? 'selected' : '' }}>Layer</option>
+                        <option value="shade" {{ $paint->color_type == 'shade' ? 'selected' : '' }}>Shade</option>
+                        <option value="dry" {{ $paint->color_type == 'dry' ? 'selected' : '' }}>Dry</option>
                     </select>
                 </div>
             </div>
@@ -212,48 +212,48 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="stock">Stock</label>
-                    <input id="stock" name="stock" type="number" placeholder="0" min="0" required>
+                    <input id="stock" name="stock" type="number" value="{{ $paint->stock }}" placeholder="0" min="0" required>
                 </div>
 
                 <div class="form-group">
                     <label for="price">Precio ($)</label>
-                    <input id="price" name="price" type="number" step="0.01" placeholder="0.00" min="0" required>
+                    <input id="price" name="price" type="number" step="0.01" value="{{ $paint->price }}" placeholder="0.00" min="0" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="expiration_date">Fecha de Caducidad</label>
-                    <input id="expiration_date" name="expiration_date" type="date">
+                    <input id="expiration_date" name="expiration_date" type="date" value="{{ $paint->expiration_date }}">
                 </div>
 
                 <div class="form-group">
                     <label for="ml">Volumen (ML)</label>
-                    <input id="ml" name="ml" type="number" placeholder="Ej. 12" min="1" required>
+                    <input id="ml" name="ml" type="number" value="{{ $paint->ml }}" placeholder="Ej. 12" min="1" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="finish">Acabado</label>
-                    <input id="finish" name="finish" type="text" placeholder="Ej. Mate, Brillante">
+                    <input id="finish" name="finish" type="text" value="{{ $paint->finish }}" placeholder="Ej. Mate, Brillante">
                 </div>
 
                 <div class="form-group">
                     <label for="code">Código</label>
-                    <input id="code" name="code" type="text" placeholder="Ej. 21-02">
+                    <input id="code" name="code" type="text" value="{{ $paint->code }}" placeholder="Ej. 21-02">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="is_active">Estado</label>
                 <select id="is_active" name="is_active" required>
-                    <option value="1">Activo</option>
-                    <option value="0">Descontinuado</option>
+                    <option value="1" {{ $paint->is_active ? 'selected' : '' }}>Activo</option>
+                    <option value="0" {{ !$paint->is_active ? 'selected' : '' }}>Descontinuado</option>
                 </select>
             </div>
 
-            <button type="submit">Guardar</button>
+            <button type="submit">Actualizar</button>
         </form>
     </div>
 

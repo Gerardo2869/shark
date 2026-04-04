@@ -16,6 +16,17 @@ class PaintController extends Controller
     public function store(Request $request)
     {
         Paint::create($request->all());
-        return "Guardado correctamente";
+        return redirect('/paints')->with('success', 'Pintura guardada exitosamente.');
+    }
+
+    public function edit(Paint $paint)
+    {
+        return view('paints.edit', compact('paint'));
+    }
+
+    public function update(Request $request, Paint $paint)
+    {
+        $paint->update($request->all());
+        return redirect('/paints')->with('success', 'Pintura actualizada exitosamente.');
     }
 }
