@@ -29,4 +29,10 @@ class PaintController extends Controller
         $paint->update($request->all());
         return redirect('/paints')->with('success', 'Pintura actualizada exitosamente.');
     }
+
+    public function destroy(Paint $paint)
+    {
+        $paint->delete();
+        return redirect('/paints')->with('success', 'Pintura eliminada exitosamente.');
+    }
 }

@@ -82,6 +82,24 @@
             background-color: #e5f0fa;
         }
 
+        .delete-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #d93d3b;
+            background-color: var(--bg-color);
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin-left: 6px;
+        }
+
+        .delete-btn:hover {
+            background-color: #fceceb;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -142,7 +160,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
 
-        button.swal2-confirm {
+        button.swal2-confirm, button.swal2-cancel {
             border-radius: 12px !important;
             padding: 12px 24px !important;
             font-size: 15px !important;
@@ -191,6 +209,11 @@
                             </td>
                             <td>
                                 <a href="/paints/{{ $paint->id }}/edit" class="edit-btn">Editar</a>
+                                <form action="{{ route('paints.destroy', $paint->id) }}" method="POST" style="display:inline-block;" class="delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="delete-btn" onclick="confirmDelete(this, '{{ addslashes($paint->name) }}')">Eliminar</button>
+                                </form>
                             </td>
                         </tr>
                     @empty
@@ -216,6 +239,28 @@
                 confirmButtonColor: '#0071e3'
             });
         @endif
+
+        function confirmDelete(button, paintName) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                html: 'Esto eliminará la pintura <strong>' + paintName + '</strong> del inventario.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d93d3b',
+                cancelButtonColor: '#86868b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'swal2-popup',
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.closest('.delete-form').submit();
+                }
+            });
+        }
     </script>
 </body>
 
