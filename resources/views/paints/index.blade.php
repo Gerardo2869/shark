@@ -12,8 +12,10 @@
             --text-muted: #86868b;
             --card-bg: #ffffff;
             --border-color: #d2d2d7;
+            --input-bg: #f5f5f7;
             --primary-color: #0071e3;
             --primary-hover: #0077ed;
+            --focus-ring: rgba(0, 113, 227, 0.4);
         }
 
         body {
@@ -160,11 +162,97 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
 
-        button.swal2-confirm, button.swal2-cancel {
+        button.swal2-confirm,
+        button.swal2-cancel {
             border-radius: 12px !important;
             padding: 12px 24px !important;
             font-size: 15px !important;
             font-weight: 600 !important;
+        }
+
+        .swal2-html-container-form {
+            margin: 1em 0 0 0 !important;
+            overflow: hidden !important;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-family: inherit;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            appearance: none;
+        }
+
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2386868b' d='M6 8.825L1.175 4 2.238 2.938 6 6.7l3.763-3.762L10.825 4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--card-bg);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .swal-submit-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 12px;
+        }
+
+        .swal-submit-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .swal-submit-btn:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -174,7 +262,8 @@
     <div class="container">
         <div class="header">
             <h1>Inventario</h1>
-            <a href="/paints/create" class="add-btn">Nueva Pintura</a>
+            <button type="button" class="add-btn" onclick="openCreateModal()"
+                style="border: none; cursor: pointer;">Nueva Pintura</button>
         </div>
 
         <div class="table-container">
@@ -208,11 +297,14 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="/paints/{{ $paint->id }}/edit" class="edit-btn">Editar</a>
-                                <form action="{{ route('paints.destroy', $paint->id) }}" method="POST" style="display:inline-block;" class="delete-form">
+                                <button type="button" class="edit-btn" style="border: none; cursor: pointer;"
+                                    data-paint="{{ json_encode($paint) }}" onclick="openEditModal(this)">Editar</button>
+                                <form action="{{ route('paints.destroy', $paint->id) }}" method="POST"
+                                    style="display:inline-block;" class="delete-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="delete-btn" onclick="confirmDelete(this, '{{ addslashes($paint->name) }}')">Eliminar</button>
+                                    <button type="button" class="delete-btn"
+                                        onclick="confirmDelete(this, '{{ addslashes($paint->name) }}')">Eliminar</button>
                                 </form>
                             </td>
                         </tr>
@@ -240,24 +332,130 @@
             });
         @endif
 
-        function confirmDelete(button, paintName) {
+            function confirmDelete(button, paintName) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    html: 'Esto eliminará la pintura <strong>' + paintName + '</strong> del inventario.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d93d3b',
+                    cancelButtonColor: '#86868b',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    customClass: {
+                        popup: 'swal2-popup',
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        button.closest('.delete-form').submit();
+                    }
+                });
+            }
+
+        function getFormHtml(paint = null) {
+            const action = paint ? '/paints/' + paint.id : '/paints';
+
+            return `
+            <form method="POST" action="${action}" id="paintForm">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                ${paint ? '<input type="hidden" name="_method" value="PUT">' : ''}
+                
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input id="name" name="name" type="text" placeholder="Ej. Macragge Blue" required value="${paint && paint.name ? paint.name.replace(/"/g, '&quot;') : ''}">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="brand">Marca</label>
+                        <input id="brand" name="brand" type="text" placeholder="Ej. Citadel" required value="${paint && paint.brand ? paint.brand.replace(/"/g, '&quot;') : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="color_type">Tipo de Color</label>
+                        <select id="color_type" name="color_type" required>
+                            <option value="base" ${paint && paint.color_type === 'base' ? 'selected' : ''}>Base</option>
+                            <option value="layer" ${paint && paint.color_type === 'layer' ? 'selected' : ''}>Layer</option>
+                            <option value="shade" ${paint && paint.color_type === 'shade' ? 'selected' : ''}>Shade</option>
+                            <option value="dry" ${paint && paint.color_type === 'dry' ? 'selected' : ''}>Dry</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stock">Stock</label>
+                        <input id="stock" name="stock" type="number" placeholder="0" min="0" required value="${paint && paint.stock !== null ? paint.stock : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Precio ($)</label>
+                        <input id="price" name="price" type="number" step="0.01" placeholder="0.00" min="0" required value="${paint && paint.price !== null ? paint.price : ''}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiration_date">Fecha de Caducidad</label>
+                        <input id="expiration_date" name="expiration_date" type="date" value="${paint && paint.expiration_date ? paint.expiration_date : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ml">Volumen (ML)</label>
+                        <input id="ml" name="ml" type="number" placeholder="Ej. 12" min="1" required value="${paint && paint.ml !== null ? paint.ml : ''}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="finish">Acabado</label>
+                        <input id="finish" name="finish" type="text" placeholder="Ej. Mate, Brillante" value="${paint && paint.finish ? paint.finish.replace(/"/g, '&quot;') : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="code">Código</label>
+                        <input id="code" name="code" type="text" placeholder="Ej. 21-02" value="${paint && paint.code ? paint.code.replace(/"/g, '&quot;') : ''}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="is_active">Estado</label>
+                    <select id="is_active" name="is_active" required>
+                        <option value="1" ${paint && paint.is_active == 1 ? 'selected' : (!paint ? 'selected' : '')}>Activo</option>
+                        <option value="0" ${paint && paint.is_active == 0 ? 'selected' : ''}>Descontinuado</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="swal-submit-btn">${paint ? 'Actualizar' : 'Guardar'}</button>
+            </form>
+            `;
+        }
+
+        function openCreateModal() {
             Swal.fire({
-                title: '¿Estás seguro?',
-                html: 'Esto eliminará la pintura <strong>' + paintName + '</strong> del inventario.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d93d3b',
-                cancelButtonColor: '#86868b',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
+                title: 'Nueva Pintura',
+                html: getFormHtml(),
+                showConfirmButton: false,
+                showCloseButton: true,
                 customClass: {
                     popup: 'swal2-popup',
-                    confirmButton: 'swal2-confirm',
-                    cancelButton: 'swal2-cancel'
+                    htmlContainer: 'swal2-html-container-form'
                 }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    button.closest('.delete-form').submit();
+            });
+        }
+
+        function openEditModal(button) {
+            const paint = JSON.parse(button.getAttribute('data-paint'));
+            Swal.fire({
+                title: 'Editar Pintura',
+                html: getFormHtml(paint),
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: {
+                    popup: 'swal2-popup',
+                    htmlContainer: 'swal2-html-container-form'
                 }
             });
         }

@@ -19,10 +19,6 @@ class PaintController extends Controller
         return redirect('/paints')->with('success', 'Pintura guardada exitosamente.');
     }
 
-    public function edit(Paint $paint)
-    {
-        return view('paints.edit', compact('paint'));
-    }
 
     public function update(Request $request, Paint $paint)
     {
