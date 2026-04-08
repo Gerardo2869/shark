@@ -35,7 +35,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             padding: 40px;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1300px;
         }
 
         .header {
@@ -102,6 +102,145 @@
             background-color: #fceceb;
         }
 
+        .search-container {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .search-group {
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .search-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .search-input,
+        .search-select {
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .search-input:focus,
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--card-bg);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pagination-wrapper nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+
+        .pagination-wrapper .flex.justify-between.flex-1.sm\:hidden {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .pagination-wrapper .hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pagination-wrapper p.text-sm.text-gray-700 {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .pagination-wrapper a,
+        .pagination-wrapper span.relative.inline-flex.items-center,
+        .pagination-wrapper span[aria-current="page"]>span,
+        .pagination-wrapper span[aria-disabled="true"]>span {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .pagination-wrapper a:hover {
+            background-color: var(--bg-color);
+        }
+
+        .pagination-wrapper span[aria-current="page"]>span {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+            border-color: var(--primary-color) !important;
+            z-index: 1;
+        }
+
+        .pagination-wrapper span[aria-disabled="true"]>span {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--bg-color);
+        }
+
+        .pagination-wrapper svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .pagination-wrapper .relative.z-0.inline-flex.rounded-md.shadow-sm.-space-x-px {
+            display: flex;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+
+        .pagination-wrapper .relative.z-0.inline-flex.rounded-md.shadow-sm.-space-x-px>* {
+            margin-left: -1px;
+        }
+
+        .pagination-wrapper .relative.z-0.inline-flex.rounded-md.shadow-sm.-space-x-px>*:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .pagination-wrapper .relative.z-0.inline-flex.rounded-md.shadow-sm.-space-x-px>*:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -110,6 +249,7 @@
             width: 100%;
             border-collapse: collapse;
             text-align: left;
+            white-space: nowrap;
         }
 
         th {
@@ -266,6 +406,43 @@
                 style="border: none; cursor: pointer;">Nueva Pintura</button>
         </div>
 
+        <div class="search-container">
+            <form action="{{ route('paints.index') }}" method="GET" class="search-form">
+                <div class="search-group" style="flex: 2; min-width: 250px;">
+                    <label for="search">Buscar</label>
+                    <input type="text" id="search" name="search" class="search-input"
+                        placeholder="Nombre, marca, código..." value="{{ request('search') }}">
+                </div>
+                <div class="search-group">
+                    <label for="sort_by">Ordenar por</label>
+                    <select id="sort_by" name="sort_by" class="search-select">
+                        <option value="id" {{ request('sort_by') == 'id' ? 'selected' : '' }}>ID</option>
+                        <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Nombre</option>
+                        <option value="brand" {{ request('sort_by') == 'brand' ? 'selected' : '' }}>Marca</option>
+                        <option value="stock" {{ request('sort_by') == 'stock' ? 'selected' : '' }}>Stock</option>
+                        <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Precio</option>
+                        <option value="expiration_date" {{ request('sort_by') == 'expiration_date' ? 'selected' : '' }}>
+                            Caducidad</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label for="sort_order">Orden</label>
+                    <select id="sort_order" name="sort_order" class="search-select">
+                        <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>Descendente
+                        </option>
+                        <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascendente</option>
+                    </select>
+                </div>
+                <div class="search-actions">
+                    <button type="submit" class="add-btn" style="padding: 10px 20px;">Buscar</button>
+                    @if(request()->has('search') || request()->has('sort_by'))
+                        <a href="{{ route('paints.index') }}" class="edit-btn"
+                            style="padding: 10px 20px; font-size: 14px; text-decoration: none; display: flex; align-items: center; border: 1px solid var(--border-color);">Limpiar</a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
         <div class="table-container">
             <table>
                 <thead>
@@ -274,6 +451,10 @@
                         <th>Nombre</th>
                         <th>Marca</th>
                         <th>Tipo</th>
+                        <th>Vol. (ml)</th>
+                        <th>Acabado</th>
+                        <th>Código</th>
+                        <th>Caducidad</th>
                         <th>Stock</th>
                         <th>Precio</th>
                         <th>Estado</th>
@@ -287,6 +468,11 @@
                             <td><strong>{{ $paint->name }}</strong></td>
                             <td>{{ $paint->brand }}</td>
                             <td style="text-transform: capitalize;">{{ $paint->color_type }}</td>
+                            <td>{{ $paint->ml ? $paint->ml . ' ml' : 'N/A' }}</td>
+                            <td>{{ $paint->finish ?: 'N/A' }}</td>
+                            <td>{{ $paint->code ?: 'N/A' }}</td>
+                            <td>{{ $paint->expiration_date ? \Carbon\Carbon::parse($paint->expiration_date)->format('d/m/Y') : 'N/A' }}
+                            </td>
                             <td class="{{ $paint->stock <= 5 ? 'stock-low' : '' }}">{{ $paint->stock }}</td>
                             <td>${{ number_format($paint->price, 2) }}</td>
                             <td>
@@ -310,13 +496,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
-                                No hay pinturas registradas en el inventario.
+                            <td colspan="12" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                                No se encontraron pinturas con esos criterios.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="pagination-wrapper">
+            {{ $paints->withQueryString()->links() }}
         </div>
     </div>
 
