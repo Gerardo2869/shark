@@ -20,6 +20,24 @@ class PaintController extends Controller
             });
         }
 
+        if ($request->filled('color_type') && $request->input('color_type') !== 'all') {
+            $query->where('color_type', $request->input('color_type'));
+        }
+
+        if ($request->filled('is_active') && $request->input('is_active') !== 'all') {
+            $query->where('is_active', $request->input('is_active'));
+        }
+
+        if ($request->filled('stock_level')) {
+            if ($request->input('stock_level') === 'low') {
+                $query->where('stock', '<=', 5)->where('stock', '>', 0);
+            } elseif ($request->input('stock_level') === 'out') {
+                $query->where('stock', 0);
+            } elseif ($request->input('stock_level') === 'in_stock') {
+                $query->where('stock', '>', 0);
+            }
+        }
+
         $sortBy = $request->input('sort_by', 'id');
         $sortOrder = $request->input('sort_order', 'desc');
 

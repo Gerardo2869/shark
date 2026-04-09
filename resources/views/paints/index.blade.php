@@ -394,6 +394,59 @@
         .swal-submit-btn:active {
             transform: scale(0.98);
         }
+
+        /* Nuevos Estilos para Filtros Avanzados y Tabla */
+        .advanced-filters {
+            display: none;
+            width: 100%;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .advanced-filters.show {
+            display: flex;
+        }
+
+        .toggle-filters-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .toggle-filters-btn:hover {
+            opacity: 0.8;
+        }
+
+        .search-main-row {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background-color: #fafafc;
+        }
+
+        .pill-btn {
+            border-radius: 20px;
+        }
     </style>
 </head>
 
@@ -408,37 +461,84 @@
 
         <div class="search-container">
             <form action="{{ route('paints.index') }}" method="GET" class="search-form">
-                <div class="search-group" style="flex: 2; min-width: 250px;">
-                    <label for="search">Buscar</label>
-                    <input type="text" id="search" name="search" class="search-input"
-                        placeholder="Nombre, marca, código..." value="{{ request('search') }}">
+                <div class="search-main-row">
+                    <div class="search-group" style="flex: 2; min-width: 250px;">
+                        <label for="search" style="display: none;">Buscar</label>
+                        <input type="text" id="search" name="search" class="search-input"
+                            placeholder="Buscar por nombre, marca o código..." value="{{ request('search') }}"
+                            style="padding: 14px 18px; border-radius: 12px; font-size: 15px;">
+                    </div>
+                    <div class="search-actions" style="display: flex; align-items: center; gap: 12px;">
+                        <button type="submit" class="add-btn pill-btn">Buscar</button>
+                        <button type="button" class="toggle-filters-btn" onclick="toggleAdvancedFilters()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            Filtros
+                        </button>
+                        @if(request()->anyFilled(['search', 'sort_by', 'color_type', 'is_active', 'stock_level']))
+                            <a href="{{ route('paints.index') }}" class="edit-btn pill-btn"
+                                style="text-decoration: none; border: 1px solid var(--border-color); display: flex; align-items: center; height: 100%;">Limpiar</a>
+                        @endif
+                    </div>
                 </div>
-                <div class="search-group">
-                    <label for="sort_by">Ordenar por</label>
-                    <select id="sort_by" name="sort_by" class="search-select">
-                        <option value="id" {{ request('sort_by') == 'id' ? 'selected' : '' }}>ID</option>
-                        <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Nombre</option>
-                        <option value="brand" {{ request('sort_by') == 'brand' ? 'selected' : '' }}>Marca</option>
-                        <option value="stock" {{ request('sort_by') == 'stock' ? 'selected' : '' }}>Stock</option>
-                        <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Precio</option>
-                        <option value="expiration_date" {{ request('sort_by') == 'expiration_date' ? 'selected' : '' }}>
-                            Caducidad</option>
-                    </select>
-                </div>
-                <div class="search-group">
-                    <label for="sort_order">Orden</label>
-                    <select id="sort_order" name="sort_order" class="search-select">
-                        <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>Descendente
-                        </option>
-                        <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascendente</option>
-                    </select>
-                </div>
-                <div class="search-actions">
-                    <button type="submit" class="add-btn" style="padding: 10px 20px;">Buscar</button>
-                    @if(request()->has('search') || request()->has('sort_by'))
-                        <a href="{{ route('paints.index') }}" class="edit-btn"
-                            style="padding: 10px 20px; font-size: 14px; text-decoration: none; display: flex; align-items: center; border: 1px solid var(--border-color);">Limpiar</a>
-                    @endif
+
+                <div class="advanced-filters" id="advancedFilters">
+                    <div class="search-group">
+                        <label for="color_type">Tipo de Color</label>
+                        <select id="color_type" name="color_type" class="search-select">
+                            <option value="all">Todos</option>
+                            <option value="base" {{ request('color_type') == 'base' ? 'selected' : '' }}>Base</option>
+                            <option value="layer" {{ request('color_type') == 'layer' ? 'selected' : '' }}>Layer</option>
+                            <option value="shade" {{ request('color_type') == 'shade' ? 'selected' : '' }}>Shade</option>
+                            <option value="dry" {{ request('color_type') == 'dry' ? 'selected' : '' }}>Dry</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="is_active">Estado</label>
+                        <select id="is_active" name="is_active" class="search-select">
+                            <option value="all">Todos</option>
+                            <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Activos</option>
+                            <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Descontinuados</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="stock_level">Inventario</label>
+                        <select id="stock_level" name="stock_level" class="search-select">
+                            <option value="all">Todo</option>
+                            <option value="in_stock" {{ request('stock_level') == 'in_stock' ? 'selected' : '' }}>En Stock
+                            </option>
+                            <option value="low" {{ request('stock_level') == 'low' ? 'selected' : '' }}>Stock Bajo (1-5)
+                            </option>
+                            <option value="out" {{ request('stock_level') == 'out' ? 'selected' : '' }}>Agotado (0)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="sort_by">Ordenar por</label>
+                        <select id="sort_by" name="sort_by" class="search-select">
+                            <option value="id" {{ request('sort_by') == 'id' ? 'selected' : '' }}>ID</option>
+                            <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Nombre</option>
+                            <option value="brand" {{ request('sort_by') == 'brand' ? 'selected' : '' }}>Marca</option>
+                            <option value="stock" {{ request('sort_by') == 'stock' ? 'selected' : '' }}>Stock</option>
+                            <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Precio</option>
+                            <option value="expiration_date" {{ request('sort_by') == 'expiration_date' ? 'selected' : '' }}>Caducidad</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="sort_order">Orden</label>
+                        <select id="sort_order" name="sort_order" class="search-select">
+                            <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>
+                                Descendente</option>
+                            <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascendente</option>
+                        </select>
+                    </div>
                 </div>
             </form>
         </div>
@@ -649,6 +749,24 @@
                 }
             });
         }
+        function toggleAdvancedFilters() {
+            const filters = document.getElementById('advancedFilters');
+            filters.classList.toggle('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const hasAdvancedFilters =
+                (params.has('color_type') && params.get('color_type') !== 'all') ||
+                (params.has('is_active') && params.get('is_active') !== 'all') ||
+                (params.has('stock_level') && params.get('stock_level') !== 'all') ||
+                (params.has('sort_by') && params.get('sort_by') !== 'id') ||
+                (params.has('sort_order') && params.get('sort_order') !== 'desc');
+
+            if (hasAdvancedFilters) {
+                document.getElementById('advancedFilters').classList.add('show');
+            }
+        });
     </script>
 </body>
 
