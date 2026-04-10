@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario de Pinturas</title>
+    <title>Inventario de Figuras</title>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -455,27 +455,23 @@
     <div class="container">
         <div class="header">
             <div style="display: flex; align-items: center; gap: 16px;">
-                <h1>Inventario de Pinturas</h1>
-                <a href="{{ url('/figures') }}"
-                    style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m9 18 6-6-6-6" />
-                    </svg>
-                    Ir a Figuras
+                <h1>Inventario de Figuras</h1>
+                <a href="{{ url('/paints') }}" style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Ir a Pinturas
                 </a>
             </div>
             <button type="button" class="add-btn" onclick="openCreateModal()"
-                style="border: none; cursor: pointer;">Nueva Pintura</button>
+                style="border: none; cursor: pointer;">Nueva Figura</button>
         </div>
 
         <div class="search-container">
-            <form action="{{ route('paints.index') }}" method="GET" class="search-form">
+            <form action="{{ route('figures.index') }}" method="GET" class="search-form">
                 <div class="search-main-row">
                     <div class="search-group" style="flex: 2; min-width: 250px;">
                         <label for="search" style="display: none;">Buscar</label>
                         <input type="text" id="search" name="search" class="search-input"
-                            placeholder="Buscar por nombre, marca o código..." value="{{ request('search') }}"
+                            placeholder="Buscar por nombre, facción o tipo..." value="{{ request('search') }}"
                             style="padding: 14px 18px; border-radius: 12px; font-size: 15px;">
                     </div>
                     <div class="search-actions" style="display: flex; align-items: center; gap: 12px;">
@@ -488,8 +484,8 @@
                             </svg>
                             Filtros
                         </button>
-                        @if(request()->anyFilled(['search', 'sort_by', 'color_type', 'is_active', 'stock_level']))
-                            <a href="{{ route('paints.index') }}" class="edit-btn pill-btn"
+                        @if(request()->anyFilled(['search', 'sort_by', 'faction', 'condition', 'is_active', 'stock_level']))
+                            <a href="{{ route('figures.index') }}" class="edit-btn pill-btn"
                                 style="text-decoration: none; border: 1px solid var(--border-color); display: flex; align-items: center; height: 100%;">Limpiar</a>
                         @endif
                     </div>
@@ -497,22 +493,27 @@
 
                 <div class="advanced-filters" id="advancedFilters">
                     <div class="search-group">
-                        <label for="color_type">Tipo de Color</label>
-                        <select id="color_type" name="color_type" class="search-select">
+                        <label for="faction">Facción</label>
+                        <input type="text" id="faction" name="faction" class="search-input" placeholder="Ej. Space Marines" value="{{ request('faction') }}">
+                    </div>
+
+                    <div class="search-group">
+                        <label for="condition">Estado</label>
+                        <select id="condition" name="condition" class="search-select">
                             <option value="all">Todos</option>
-                            <option value="base" {{ request('color_type') == 'base' ? 'selected' : '' }}>Base</option>
-                            <option value="layer" {{ request('color_type') == 'layer' ? 'selected' : '' }}>Layer</option>
-                            <option value="shade" {{ request('color_type') == 'shade' ? 'selected' : '' }}>Shade</option>
-                            <option value="dry" {{ request('color_type') == 'dry' ? 'selected' : '' }}>Dry</option>
+                            <option value="En matriz" {{ request('condition') == 'En matriz' ? 'selected' : '' }}>En matriz (Sprue)</option>
+                            <option value="Ensamblado" {{ request('condition') == 'Ensamblado' ? 'selected' : '' }}>Ensamblado</option>
+                            <option value="Imprimado" {{ request('condition') == 'Imprimado' ? 'selected' : '' }}>Imprimado (Primed)</option>
+                            <option value="Pintado" {{ request('condition') == 'Pintado' ? 'selected' : '' }}>Pintado</option>
                         </select>
                     </div>
 
                     <div class="search-group">
-                        <label for="is_active">Estado</label>
+                        <label for="is_active">Visibilidad</label>
                         <select id="is_active" name="is_active" class="search-select">
                             <option value="all">Todos</option>
                             <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Activos</option>
-                            <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Descontinuados</option>
+                            <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Ocultos</option>
                         </select>
                     </div>
 
@@ -520,12 +521,9 @@
                         <label for="stock_level">Inventario</label>
                         <select id="stock_level" name="stock_level" class="search-select">
                             <option value="all">Todo</option>
-                            <option value="in_stock" {{ request('stock_level') == 'in_stock' ? 'selected' : '' }}>En Stock
-                            </option>
-                            <option value="low" {{ request('stock_level') == 'low' ? 'selected' : '' }}>Stock Bajo (1-5)
-                            </option>
-                            <option value="out" {{ request('stock_level') == 'out' ? 'selected' : '' }}>Agotado (0)
-                            </option>
+                            <option value="in_stock" {{ request('stock_level') == 'in_stock' ? 'selected' : '' }}>En Stock</option>
+                            <option value="low" {{ request('stock_level') == 'low' ? 'selected' : '' }}>Stock Bajo (1-2)</option>
+                            <option value="out" {{ request('stock_level') == 'out' ? 'selected' : '' }}>Agotado (0)</option>
                         </select>
                     </div>
 
@@ -534,18 +532,17 @@
                         <select id="sort_by" name="sort_by" class="search-select">
                             <option value="id" {{ request('sort_by') == 'id' ? 'selected' : '' }}>ID</option>
                             <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Nombre</option>
-                            <option value="brand" {{ request('sort_by') == 'brand' ? 'selected' : '' }}>Marca</option>
+                            <option value="faction" {{ request('sort_by') == 'faction' ? 'selected' : '' }}>Facción</option>
                             <option value="stock" {{ request('sort_by') == 'stock' ? 'selected' : '' }}>Stock</option>
                             <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Precio</option>
-                            <option value="expiration_date" {{ request('sort_by') == 'expiration_date' ? 'selected' : '' }}>Caducidad</option>
+                            <option value="points" {{ request('sort_by') == 'points' ? 'selected' : '' }}>Puntos</option>
                         </select>
                     </div>
 
                     <div class="search-group">
                         <label for="sort_order">Orden</label>
                         <select id="sort_order" name="sort_order" class="search-select">
-                            <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>
-                                Descendente</option>
+                            <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>Descendente</option>
                             <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascendente</option>
                         </select>
                     </div>
@@ -559,55 +556,50 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>Marca</th>
-                        <th>Tipo</th>
-                        <th>Vol. (ml)</th>
-                        <th>Acabado</th>
-                        <th>Código</th>
-                        <th>Caducidad</th>
+                        <th>Facción</th>
+                        <th>Tipo Unidad</th>
+                        <th>Estado</th>
+                        <th>Pts</th>
                         <th>Stock</th>
                         <th>Precio</th>
-                        <th>Estado</th>
+                        <th>Visibilidad</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($paints as $paint)
+                    @forelse($figures as $figure)
                         <tr>
-                            <td>{{ $paint->id }}</td>
-                            <td><strong>{{ $paint->name }}</strong></td>
-                            <td>{{ $paint->brand }}</td>
-                            <td style="text-transform: capitalize;">{{ $paint->color_type }}</td>
-                            <td>{{ $paint->ml ? $paint->ml . ' ml' : 'N/A' }}</td>
-                            <td>{{ $paint->finish ?: 'N/A' }}</td>
-                            <td>{{ $paint->code ?: 'N/A' }}</td>
-                            <td>{{ $paint->expiration_date ? \Carbon\Carbon::parse($paint->expiration_date)->format('d/m/Y') : 'N/A' }}
-                            </td>
-                            <td class="{{ $paint->stock <= 5 ? 'stock-low' : '' }}">{{ $paint->stock }}</td>
-                            <td>${{ number_format($paint->price, 2) }}</td>
+                            <td>{{ $figure->id }}</td>
+                            <td><strong>{{ $figure->name }}</strong></td>
+                            <td>{{ $figure->faction ?: 'N/A' }}</td>
+                            <td>{{ $figure->unit_type ?: 'N/A' }}</td>
+                            <td>{{ $figure->condition ?: 'N/A' }}</td>
+                            <td>{{ $figure->points ?: '-' }}</td>
+                            <td class="{{ $figure->stock <= 2 ? 'stock-low' : '' }}">{{ $figure->stock }}</td>
+                            <td>{{ $figure->price ? '$' . number_format($figure->price, 2) : 'N/A' }}</td>
                             <td>
-                                @if($paint->is_active)
+                                @if($figure->is_active)
                                     <span class="status-badge status-active">Activo</span>
                                 @else
-                                    <span class="status-badge status-inactive">Desc.</span>
+                                    <span class="status-badge status-inactive">Oculto</span>
                                 @endif
                             </td>
                             <td>
                                 <button type="button" class="edit-btn" style="border: none; cursor: pointer;"
-                                    data-paint="{{ json_encode($paint) }}" onclick="openEditModal(this)">Editar</button>
-                                <form action="{{ route('paints.destroy', $paint->id) }}" method="POST"
+                                    data-figure="{{ json_encode($figure) }}" onclick="openEditModal(this)">Editar</button>
+                                <form action="{{ route('figures.destroy', $figure->id) }}" method="POST"
                                     style="display:inline-block;" class="delete-form">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="delete-btn"
-                                        onclick="confirmDelete(this, '{{ addslashes($paint->name) }}')">Eliminar</button>
+                                        onclick="confirmDelete(this, '{{ addslashes($figure->name) }}')">Eliminar</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
-                                No se encontraron pinturas con esos criterios.
+                            <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                                No se encontraron figuras con esos criterios.
                             </td>
                         </tr>
                     @endforelse
@@ -616,7 +608,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $paints->withQueryString()->links() }}
+            {{ $figures->withQueryString()->links() }}
         </div>
     </div>
 
@@ -632,10 +624,10 @@
             });
         @endif
 
-            function confirmDelete(button, paintName) {
+            function confirmDelete(button, figureName) {
                 Swal.fire({
                     title: '¿Estás seguro?',
-                    html: 'Esto eliminará la pintura <strong>' + paintName + '</strong> del inventario.',
+                    html: 'Esto eliminará la figura <strong>' + figureName + '</strong> del inventario.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d93d3b',
@@ -654,88 +646,103 @@
                 });
             }
 
-        function getFormHtml(paint = null) {
-            const action = paint ? '/paints/' + paint.id : '/paints';
+        function getFormHtml(figure = null) {
+            const action = figure ? '/figures/' + figure.id : '/figures';
 
             return `
-            <form method="POST" action="${action}" id="paintForm">
+            <form method="POST" action="${action}" id="figureForm">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                ${paint ? '<input type="hidden" name="_method" value="PUT">' : ''}
+                ${figure ? '<input type="hidden" name="_method" value="PUT">' : ''}
                 
                 <div class="form-group">
-                    <label for="name">Nombre</label>
-                    <input id="name" name="name" type="text" placeholder="Ej. Macragge Blue" required value="${paint && paint.name ? paint.name.replace(/"/g, '&quot;') : ''}">
+                    <label for="name">Nombre de Figura / Unidad</label>
+                    <input id="name" name="name" type="text" placeholder="Ej. Space Marine Intercessors" required value="${figure && figure.name ? figure.name.replace(/"/g, '&quot;') : ''}">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="brand">Marca</label>
-                        <input id="brand" name="brand" type="text" placeholder="Ej. Citadel" required value="${paint && paint.brand ? paint.brand.replace(/"/g, '&quot;') : ''}">
+                        <label for="faction">Facción</label>
+                        <input id="faction" name="faction" type="text" placeholder="Ej. Ultramarines" value="${figure && figure.faction ? figure.faction.replace(/"/g, '&quot;') : ''}">
                     </div>
 
                     <div class="form-group">
-                        <label for="color_type">Tipo de Color</label>
-                        <select id="color_type" name="color_type" required>
-                            <option value="base" ${paint && paint.color_type === 'base' ? 'selected' : ''}>Base</option>
-                            <option value="layer" ${paint && paint.color_type === 'layer' ? 'selected' : ''}>Layer</option>
-                            <option value="shade" ${paint && paint.color_type === 'shade' ? 'selected' : ''}>Shade</option>
-                            <option value="dry" ${paint && paint.color_type === 'dry' ? 'selected' : ''}>Dry</option>
+                        <label for="unit_type">Tipo de Unidad</label>
+                        <select id="unit_type" name="unit_type">
+                            <option value="">Seleccionar...</option>
+                            <option value="HQ" ${figure && figure.unit_type === 'HQ' ? 'selected' : ''}>HQ</option>
+                            <option value="Troops" ${figure && figure.unit_type === 'Troops' ? 'selected' : ''}>Troops</option>
+                            <option value="Elites" ${figure && figure.unit_type === 'Elites' ? 'selected' : ''}>Elites</option>
+                            <option value="Fast Attack" ${figure && figure.unit_type === 'Fast Attack' ? 'selected' : ''}>Fast Attack</option>
+                            <option value="Heavy Support" ${figure && figure.unit_type === 'Heavy Support' ? 'selected' : ''}>Heavy Support</option>
+                            <option value="Lord of War" ${figure && figure.unit_type === 'Lord of War' ? 'selected' : ''}>Lord of War</option>
+                            <option value="Other" ${figure && figure.unit_type === 'Other' ? 'selected' : ''}>Other</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="stock">Stock</label>
-                        <input id="stock" name="stock" type="number" placeholder="0" min="0" required value="${paint && paint.stock !== null ? paint.stock : ''}">
+                        <label for="condition">Estado de Pintado/Armado</label>
+                        <select id="condition" name="condition">
+                            <option value="">Seleccionar...</option>
+                            <option value="En matriz" ${figure && figure.condition === 'En matriz' ? 'selected' : ''}>En matriz (Sprue)</option>
+                            <option value="Ensamblado" ${figure && figure.condition === 'Ensamblado' ? 'selected' : ''}>Ensamblado</option>
+                            <option value="Imprimado" ${figure && figure.condition === 'Imprimado' ? 'selected' : ''}>Imprimado</option>
+                            <option value="Pintado" ${figure && figure.condition === 'Pintado' ? 'selected' : ''}>Pintado</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="price">Precio ($)</label>
-                        <input id="price" name="price" type="number" step="0.01" placeholder="0.00" min="0" required value="${paint && paint.price !== null ? paint.price : ''}">
+                        <label for="material">Material</label>
+                        <select id="material" name="material">
+                            <option value="">Seleccionar...</option>
+                            <option value="Plastic" ${figure && figure.material === 'Plastic' ? 'selected' : ''}>Plástico</option>
+                            <option value="Resin" ${figure && figure.material === 'Resin' ? 'selected' : ''}>Resina (Forge World/Finecast)</option>
+                            <option value="Metal" ${figure && figure.material === 'Metal' ? 'selected' : ''}>Metal</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="expiration_date">Fecha de Caducidad</label>
-                        <input id="expiration_date" name="expiration_date" type="date" value="${paint && paint.expiration_date ? paint.expiration_date : ''}">
+                        <label for="stock">Stock (Cajas/Modelos)</label>
+                        <input id="stock" name="stock" type="number" placeholder="0" min="0" required value="${figure && figure.stock !== null ? figure.stock : ''}">
                     </div>
 
                     <div class="form-group">
-                        <label for="ml">Volumen (ML)</label>
-                        <input id="ml" name="ml" type="number" placeholder="Ej. 12" min="1" required value="${paint && paint.ml !== null ? paint.ml : ''}">
+                        <label for="price">Valor ($) Opcional</label>
+                        <input id="price" name="price" type="number" step="0.01" placeholder="0.00" min="0" value="${figure && figure.price !== null ? figure.price : ''}">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="finish">Acabado</label>
-                        <input id="finish" name="finish" type="text" placeholder="Ej. Mate, Brillante" value="${paint && paint.finish ? paint.finish.replace(/"/g, '&quot;') : ''}">
+                        <label for="points">Puntos en Juego (Opcional)</label>
+                        <input id="points" name="points" type="number" placeholder="Ej. 120" value="${figure && figure.points !== null ? figure.points : ''}">
                     </div>
 
                     <div class="form-group">
-                        <label for="code">Código</label>
-                        <input id="code" name="code" type="text" placeholder="Ej. 21-02" value="${paint && paint.code ? paint.code.replace(/"/g, '&quot;') : ''}">
+                        <label for="base_size">Tamaño Base (Opcional)</label>
+                        <input id="base_size" name="base_size" type="text" placeholder="Ej. 32mm" value="${figure && figure.base_size ? figure.base_size.replace(/"/g, '&quot;') : ''}">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="is_active">Estado</label>
+                    <label for="is_active">Visibilidad</label>
                     <select id="is_active" name="is_active" required>
-                        <option value="1" ${paint && paint.is_active == 1 ? 'selected' : (!paint ? 'selected' : '')}>Activo</option>
-                        <option value="0" ${paint && paint.is_active == 0 ? 'selected' : ''}>Descontinuado</option>
+                        <option value="1" ${figure && figure.is_active == 1 ? 'selected' : (!figure ? 'selected' : '')}>Activo</option>
+                        <option value="0" ${figure && figure.is_active == 0 ? 'selected' : ''}>Oculto</option>
                     </select>
                 </div>
 
-                <button type="submit" class="swal-submit-btn">${paint ? 'Actualizar' : 'Guardar'}</button>
+                <button type="submit" class="swal-submit-btn">${figure ? 'Actualizar Figura' : 'Guardar Figura'}</button>
             </form>
             `;
         }
 
         function openCreateModal() {
             Swal.fire({
-                title: 'Nueva Pintura',
+                title: 'Nueva Figura / Unidad',
                 html: getFormHtml(),
                 showConfirmButton: false,
                 showCloseButton: true,
@@ -747,10 +754,10 @@
         }
 
         function openEditModal(button) {
-            const paint = JSON.parse(button.getAttribute('data-paint'));
+            const figure = JSON.parse(button.getAttribute('data-figure'));
             Swal.fire({
-                title: 'Editar Pintura',
-                html: getFormHtml(paint),
+                title: 'Editar Figura',
+                html: getFormHtml(figure),
                 showConfirmButton: false,
                 showCloseButton: true,
                 customClass: {
@@ -767,7 +774,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const hasAdvancedFilters =
-                (params.has('color_type') && params.get('color_type') !== 'all') ||
+                (params.has('faction') && params.get('faction') !== '') ||
+                (params.has('condition') && params.get('condition') !== 'all') ||
                 (params.has('is_active') && params.get('is_active') !== 'all') ||
                 (params.has('stock_level') && params.get('stock_level') !== 'all') ||
                 (params.has('sort_by') && params.get('sort_by') !== 'id') ||
