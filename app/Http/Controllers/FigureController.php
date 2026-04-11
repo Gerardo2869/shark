@@ -60,19 +60,39 @@ class FigureController extends Controller
 
     public function store(Request $request)
     {
-        Figure::create($request->all());
+        $data = $request->all();
+        
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('figures', 'public');
+            $data['image'] = $path;
+        }
+
+        Figure::create($data);
         return redirect('/figures')->with('success', 'Figura guardada exitosamente.');
     }
 
 
     public function update(Request $request, Figure $figure)
     {
-        $figure->update($request->all());
+        $data = $request->all();
+        
+        if ($request->hasFile('image')) {
+            if ($figure->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($figure->image);
+            }
+            $path = $request->file('image')->store('figures', 'public');
+            $data['image'] = $path;
+        }
+
+        $figure->update($data);
         return redirect('/figures')->with('success', 'Figura actualizada exitosamente.');
     }
 
     public function destroy(Figure $figure)
     {
+        if ($figure->image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($figure->image);
+        }
         $figure->delete();
         return redirect('/figures')->with('success', 'Figura eliminada exitosamente.');
     }

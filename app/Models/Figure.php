@@ -8,6 +8,7 @@ class Figure extends Model
 {
     protected $fillable = [
         'name',
+        'image',
         'faction',
         'unit_type',
         'material',

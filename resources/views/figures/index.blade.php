@@ -456,8 +456,12 @@
         <div class="header">
             <div style="display: flex; align-items: center; gap: 16px;">
                 <h1>Inventario de Figuras</h1>
-                <a href="{{ url('/paints') }}" style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                <a href="{{ url('/paints') }}"
+                    style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
                     Ir a Pinturas
                 </a>
             </div>
@@ -494,17 +498,22 @@
                 <div class="advanced-filters" id="advancedFilters">
                     <div class="search-group">
                         <label for="faction">Facción</label>
-                        <input type="text" id="faction" name="faction" class="search-input" placeholder="Ej. Space Marines" value="{{ request('faction') }}">
+                        <input type="text" id="faction" name="faction" class="search-input"
+                            placeholder="Ej. Space Marines" value="{{ request('faction') }}">
                     </div>
 
                     <div class="search-group">
                         <label for="condition">Estado</label>
                         <select id="condition" name="condition" class="search-select">
                             <option value="all">Todos</option>
-                            <option value="En matriz" {{ request('condition') == 'En matriz' ? 'selected' : '' }}>En matriz (Sprue)</option>
-                            <option value="Ensamblado" {{ request('condition') == 'Ensamblado' ? 'selected' : '' }}>Ensamblado</option>
-                            <option value="Imprimado" {{ request('condition') == 'Imprimado' ? 'selected' : '' }}>Imprimado (Primed)</option>
-                            <option value="Pintado" {{ request('condition') == 'Pintado' ? 'selected' : '' }}>Pintado</option>
+                            <option value="En matriz" {{ request('condition') == 'En matriz' ? 'selected' : '' }}>En
+                                matriz (Sprue)</option>
+                            <option value="Ensamblado" {{ request('condition') == 'Ensamblado' ? 'selected' : '' }}>
+                                Ensamblado</option>
+                            <option value="Imprimado" {{ request('condition') == 'Imprimado' ? 'selected' : '' }}>
+                                Imprimado (Primed)</option>
+                            <option value="Pintado" {{ request('condition') == 'Pintado' ? 'selected' : '' }}>Pintado
+                            </option>
                         </select>
                     </div>
 
@@ -521,9 +530,12 @@
                         <label for="stock_level">Inventario</label>
                         <select id="stock_level" name="stock_level" class="search-select">
                             <option value="all">Todo</option>
-                            <option value="in_stock" {{ request('stock_level') == 'in_stock' ? 'selected' : '' }}>En Stock</option>
-                            <option value="low" {{ request('stock_level') == 'low' ? 'selected' : '' }}>Stock Bajo (1-2)</option>
-                            <option value="out" {{ request('stock_level') == 'out' ? 'selected' : '' }}>Agotado (0)</option>
+                            <option value="in_stock" {{ request('stock_level') == 'in_stock' ? 'selected' : '' }}>En Stock
+                            </option>
+                            <option value="low" {{ request('stock_level') == 'low' ? 'selected' : '' }}>Stock Bajo (1-2)
+                            </option>
+                            <option value="out" {{ request('stock_level') == 'out' ? 'selected' : '' }}>Agotado (0)
+                            </option>
                         </select>
                     </div>
 
@@ -532,7 +544,8 @@
                         <select id="sort_by" name="sort_by" class="search-select">
                             <option value="id" {{ request('sort_by') == 'id' ? 'selected' : '' }}>ID</option>
                             <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Nombre</option>
-                            <option value="faction" {{ request('sort_by') == 'faction' ? 'selected' : '' }}>Facción</option>
+                            <option value="faction" {{ request('sort_by') == 'faction' ? 'selected' : '' }}>Facción
+                            </option>
                             <option value="stock" {{ request('sort_by') == 'stock' ? 'selected' : '' }}>Stock</option>
                             <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Precio</option>
                             <option value="points" {{ request('sort_by') == 'points' ? 'selected' : '' }}>Puntos</option>
@@ -542,7 +555,8 @@
                     <div class="search-group">
                         <label for="sort_order">Orden</label>
                         <select id="sort_order" name="sort_order" class="search-select">
-                            <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>Descendente</option>
+                            <option value="desc" {{ request('sort_order', 'desc') == 'desc' ? 'selected' : '' }}>
+                                Descendente</option>
                             <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascendente</option>
                         </select>
                     </div>
@@ -555,6 +569,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Facción</th>
                         <th>Tipo Unidad</th>
@@ -570,6 +585,16 @@
                     @forelse($figures as $figure)
                         <tr>
                             <td>{{ $figure->id }}</td>
+                            <td>
+                                @if($figure->image)
+                                    <img src="{{ asset('storage/' . $figure->image) }}" alt="Imagen de {{ $figure->name }}"
+                                        style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; display: block;">
+                                @else
+                                    <div
+                                        style="width: 48px; height: 48px; background-color: var(--input-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; text-align: center; border: 1px dashed var(--border-color);">
+                                        Sin img</div>
+                                @endif
+                            </td>
                             <td><strong>{{ $figure->name }}</strong></td>
                             <td>{{ $figure->faction ?: 'N/A' }}</td>
                             <td>{{ $figure->unit_type ?: 'N/A' }}</td>
@@ -598,7 +623,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                            <td colspan="11" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
                                 No se encontraron figuras con esos criterios.
                             </td>
                         </tr>
@@ -650,7 +675,7 @@
             const action = figure ? '/figures/' + figure.id : '/figures';
 
             return `
-            <form method="POST" action="${action}" id="figureForm">
+            <form method="POST" action="${action}" id="figureForm" enctype="multipart/form-data">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 ${figure ? '<input type="hidden" name="_method" value="PUT">' : ''}
                 
@@ -727,12 +752,20 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="is_active">Visibilidad</label>
-                    <select id="is_active" name="is_active" required>
-                        <option value="1" ${figure && figure.is_active == 1 ? 'selected' : (!figure ? 'selected' : '')}>Activo</option>
-                        <option value="0" ${figure && figure.is_active == 0 ? 'selected' : ''}>Oculto</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="image">Imagen (Opcional)</label>
+                        <input id="image" name="image" type="file" accept="image/*" style="padding: 9px 16px;">
+                        ${figure && figure.image ? `<div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Ya tiene una imagen. Sube una nueva para reemplazarla.</div>` : ''}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="is_active">Visibilidad</label>
+                        <select id="is_active" name="is_active" required>
+                            <option value="1" ${figure && figure.is_active == 1 ? 'selected' : (!figure ? 'selected' : '')}>Activo</option>
+                            <option value="0" ${figure && figure.is_active == 0 ? 'selected' : ''}>Oculto</option>
+                        </select>
+                    </div>
                 </div>
 
                 <button type="submit" class="swal-submit-btn">${figure ? 'Actualizar Figura' : 'Guardar Figura'}</button>
