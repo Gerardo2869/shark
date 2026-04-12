@@ -755,8 +755,16 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="image">Imagen (Opcional)</label>
-                        <input id="image" name="image" type="file" accept="image/*" style="padding: 9px 16px;">
-                        ${figure && figure.image ? `<div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Ya tiene una imagen. Sube una nueva para reemplazarla.</div>` : ''}
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <div style="flex: 1; min-width: 0;">
+                                <input id="image" name="image" type="file" accept="image/*" style="padding: 9px 16px; width: 100%;" onchange="previewImage(event)">
+                                ${figure && figure.image ? '<div style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">Ya tiene imagen. Sube otra para reemplazarla.</div>' : ''}
+                            </div>
+                            <div style="width: 48px; height: 48px; flex-shrink: 0; border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: var(--input-bg);">
+                                <img id="imagePreview" src="${figure && figure.image ? '{{ asset('storage') }}/' + figure.image : ''}" style="width: 100%; height: 100%; object-fit: cover; display: ${figure && figure.image ? 'block' : 'none'};">
+                                <span id="imagePreviewText" style="font-size: 9px; color: var(--text-muted); text-align: center; display: ${figure && figure.image ? 'none' : 'block'};">Sin img</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -799,6 +807,25 @@
                 }
             });
         }
+
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('imagePreview');
+            const previewText = document.getElementById('imagePreviewText');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    previewText.style.display = 'none';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         function toggleAdvancedFilters() {
             const filters = document.getElementById('advancedFilters');
             filters.classList.toggle('show');
