@@ -312,7 +312,7 @@
 
         .swal2-html-container-form {
             margin: 1em 0 0 0 !important;
-            overflow: hidden !important;
+            overflow: visible !important;
         }
 
         .form-group {
@@ -447,6 +447,42 @@
         .pill-btn {
             border-radius: 20px;
         }
+
+        .image-preview-container {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--input-bg);
+            position: relative;
+        }
+
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .image-preview-container img:hover {
+            transform: scale(2.8);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+        }
+
+        .image-preview-container span {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-align: center;
+            position: absolute;
+        }
     </style>
 </head>
 
@@ -548,7 +584,6 @@
                             </option>
                             <option value="stock" {{ request('sort_by') == 'stock' ? 'selected' : '' }}>Stock</option>
                             <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Precio</option>
-                            <option value="points" {{ request('sort_by') == 'points' ? 'selected' : '' }}>Puntos</option>
                         </select>
                     </div>
 
@@ -574,7 +609,6 @@
                         <th>Facción</th>
                         <th>Tipo Unidad</th>
                         <th>Estado</th>
-                        <th>Pts</th>
                         <th>Stock</th>
                         <th>Precio</th>
                         <th>Visibilidad</th>
@@ -599,7 +633,6 @@
                             <td>{{ $figure->faction ?: 'N/A' }}</td>
                             <td>{{ $figure->unit_type ?: 'N/A' }}</td>
                             <td>{{ $figure->condition ?: 'N/A' }}</td>
-                            <td>{{ $figure->points ?: '-' }}</td>
                             <td class="{{ $figure->stock <= 2 ? 'stock-low' : '' }}">{{ $figure->stock }}</td>
                             <td>{{ $figure->price ? '$' . number_format($figure->price, 2) : 'N/A' }}</td>
                             <td>
@@ -742,29 +775,8 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="points">Puntos en Juego (Opcional)</label>
-                        <input id="points" name="points" type="number" placeholder="Ej. 120" value="${figure && figure.points !== null ? figure.points : ''}">
-                    </div>
-
-                    <div class="form-group">
                         <label for="base_size">Tamaño Base (Opcional)</label>
                         <input id="base_size" name="base_size" type="text" placeholder="Ej. 32mm" value="${figure && figure.base_size ? figure.base_size.replace(/"/g, '&quot;') : ''}">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="image">Imagen (Opcional)</label>
-                        <div style="display: flex; gap: 12px; align-items: flex-start;">
-                            <div style="flex: 1; min-width: 0;">
-                                <input id="image" name="image" type="file" accept="image/*" style="padding: 9px 16px; width: 100%;" onchange="previewImage(event)">
-                                ${figure && figure.image ? '<div style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">Ya tiene imagen. Sube otra para reemplazarla.</div>' : ''}
-                            </div>
-                            <div style="width: 48px; height: 48px; flex-shrink: 0; border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: var(--input-bg);">
-                                <img id="imagePreview" src="${figure && figure.image ? '{{ asset('storage') }}/' + figure.image : ''}" style="width: 100%; height: 100%; object-fit: cover; display: ${figure && figure.image ? 'block' : 'none'};">
-                                <span id="imagePreviewText" style="font-size: 9px; color: var(--text-muted); text-align: center; display: ${figure && figure.image ? 'none' : 'block'};">Sin img</span>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="form-group">
@@ -773,6 +785,20 @@
                             <option value="1" ${figure && figure.is_active == 1 ? 'selected' : (!figure ? 'selected' : '')}>Activo</option>
                             <option value="0" ${figure && figure.is_active == 0 ? 'selected' : ''}>Oculto</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Imagen (Opcional)</label>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="flex: 1; min-width: 0;">
+                            <input id="image" name="image" type="file" accept="image/*" style="padding: 9px 16px; width: 100%;" onchange="previewImage(event)">
+                            ${figure && figure.image ? '<div style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">Ya tiene imagen. Sube otra para reemplazarla.</div>' : ''}
+                        </div>
+                        <div class="image-preview-container">
+                            <img id="imagePreview" src="${figure && figure.image ? '{{ asset('storage') }}/' + figure.image : ''}" style="display: ${figure && figure.image ? 'block' : 'none'};">
+                            <span id="imagePreviewText" style="display: ${figure && figure.image ? 'none' : 'block'};">Sin img</span>
+                        </div>
                     </div>
                 </div>
 
