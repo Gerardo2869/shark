@@ -51,7 +51,10 @@ class PaintController extends Controller
 
         $paints = $query->paginate(12);
 
-        return view('paints.index', compact('paints'));
+        $outOfStockCount = Paint::where('stock', 0)->where('is_active', 1)->count();
+        $lowStockCount = Paint::where('stock', '>', 0)->where('stock', '<=', 5)->where('is_active', 1)->count();
+
+        return view('paints.index', compact('paints', 'outOfStockCount', 'lowStockCount'));
     }
 
     public function store(Request $request)

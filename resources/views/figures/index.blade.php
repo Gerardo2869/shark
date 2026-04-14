@@ -291,6 +291,11 @@
             color: #d93d3b;
         }
 
+        .status-warning {
+            background-color: #fff7ed;
+            color: #c2410c;
+        }
+
         .stock-low {
             color: #d93d3b;
             font-weight: 600;
@@ -505,6 +510,43 @@
                 style="border: none; cursor: pointer;">Nueva Figura</button>
         </div>
 
+        @if((isset($outOfStockCount) && $outOfStockCount > 0) || (isset($lowStockCount) && $lowStockCount > 0))
+            <div
+                style="background-color: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="flex-shrink: 0; margin-top: 2px;">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                    <h4 style="margin: 0 0 4px 0; color: #9a3412; font-size: 14px; font-weight: 600;">Aviso de Inventario
+                    </h4>
+                    <p style="margin: 0; color: #c2410c; font-size: 14px; line-height: 1.4;">
+                        @if($outOfStockCount > 0 && $lowStockCount > 0)
+                            @if($outOfStockCount == 1 && $lowStockCount == 1)
+                                Hay <strong>una</strong> figura agotada y <strong>otra</strong> con poco stock.
+                            @elseif($outOfStockCount == 1)
+                                Hay <strong>una</strong> figura agotada y <strong>{{ $lowStockCount }}</strong> con poco stock.
+                            @elseif($lowStockCount == 1)
+                                Hay <strong>{{ $outOfStockCount }}</strong> figuras agotadas y <strong>otra</strong> con poco stock.
+                            @else
+                                Hay <strong>{{ $outOfStockCount }}</strong> figuras agotadas y <strong>{{ $lowStockCount }}</strong>
+                                con poco stock.
+                            @endif
+                        @elseif($outOfStockCount > 0)
+                            Hay <strong>{{ $outOfStockCount == 1 ? 'una' : $outOfStockCount }}</strong>
+                            {{ $outOfStockCount == 1 ? 'figura agotada' : 'figuras agotadas' }}.
+                        @else
+                            Hay <strong>{{ $lowStockCount == 1 ? 'una' : $lowStockCount }}</strong>
+                            {{ $lowStockCount == 1 ? 'figura' : 'figuras' }} con poco stock.
+                        @endif
+                    </p>
+                </div>
+            </div>
+        @endif
+
         <div class="search-container">
             <form action="{{ route('figures.index') }}" method="GET" class="search-form">
                 <div class="search-main-row">
@@ -633,7 +675,16 @@
                             <td>{{ $figure->faction ?: 'N/A' }}</td>
                             <td>{{ $figure->unit_type ?: 'N/A' }}</td>
                             <td>{{ $figure->condition ?: 'N/A' }}</td>
-                            <td class="{{ $figure->stock <= 2 ? 'stock-low' : '' }}">{{ $figure->stock }}</td>
+                            <td>
+                                <span class="{{ $figure->stock <= 2 ? 'stock-low' : '' }}">{{ $figure->stock }}</span>
+                                @if($figure->stock == 0)
+                                    <span class="status-badge status-inactive"
+                                        style="font-size: 11px; padding: 2px 6px; margin-left: 6px;">Agotado</span>
+                                @elseif($figure->stock <= 2)
+                                    <span class="status-badge status-warning"
+                                        style="font-size: 11px; padding: 2px 6px; margin-left: 6px;">Poco stock</span>
+                                @endif
+                            </td>
                             <td>{{ $figure->price ? '$' . number_format($figure->price, 2) : 'N/A' }}</td>
                             <td>
                                 @if($figure->is_active)

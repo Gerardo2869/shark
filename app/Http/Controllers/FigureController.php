@@ -55,7 +55,10 @@ class FigureController extends Controller
 
         $figures = $query->paginate(12);
 
-        return view('figures.index', compact('figures'));
+        $outOfStockCount = Figure::where('stock', 0)->where('is_active', 1)->count();
+        $lowStockCount = Figure::where('stock', '>', 0)->where('stock', '<=', 2)->where('is_active', 1)->count();
+
+        return view('figures.index', compact('figures', 'outOfStockCount', 'lowStockCount'));
     }
 
     public function store(Request $request)
