@@ -471,8 +471,10 @@
                 </a>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
-                <button type="button" class="add-btn" onclick="openCreateModal()"
-                    style="border: none; cursor: pointer;">Nueva Pintura</button>
+                @if(auth()->user()->isAdmin())
+                    <button type="button" class="add-btn" onclick="openCreateModal()"
+                        style="border: none; cursor: pointer;">Nueva Pintura</button>
+                @endif
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
                     <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar Sesión</button>
@@ -609,7 +611,9 @@
                         <th>Stock</th>
                         <th>Precio</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        @if(auth()->user()->isAdmin())
+                            <th>Acciones</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -640,17 +644,19 @@
                                     <span class="status-badge status-inactive">Desc.</span>
                                 @endif
                             </td>
-                            <td>
-                                <button type="button" class="edit-btn" style="border: none; cursor: pointer;"
-                                    data-paint="{{ json_encode($paint) }}" onclick="openEditModal(this)">Editar</button>
-                                <form action="{{ route('paints.destroy', $paint->id) }}" method="POST"
-                                    style="display:inline-block;" class="delete-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="delete-btn"
-                                        onclick="confirmDelete(this, '{{ addslashes($paint->name) }}')">Eliminar</button>
-                                </form>
-                            </td>
+                            @if(auth()->user()->isAdmin())
+                                <td>
+                                    <button type="button" class="edit-btn" style="border: none; cursor: pointer;"
+                                        data-paint="{{ json_encode($paint) }}" onclick="openEditModal(this)">Editar</button>
+                                    <form action="{{ route('paints.destroy', $paint->id) }}" method="POST"
+                                        style="display:inline-block;" class="delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="delete-btn"
+                                            onclick="confirmDelete(this, '{{ addslashes($paint->name) }}')">Eliminar</button>
+                                    </form>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>

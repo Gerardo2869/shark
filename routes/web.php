@@ -14,13 +14,18 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware('auth')->group(function () {
-    Route::post('/paints', [PaintController::class, 'store']);
+    // Read access: auth users
     Route::get('/paints', [PaintController::class, 'index'])->name('paints.index');
-    Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');
-    Route::delete('/paints/{paint}', [PaintController::class, 'destroy'])->name('paints.destroy');
-
-    Route::post('/figures', [FigureController::class, 'store']);
     Route::get('/figures', [FigureController::class, 'index'])->name('figures.index');
-    Route::put('/figures/{figure}', [FigureController::class, 'update'])->name('figures.update');
-    Route::delete('/figures/{figure}', [FigureController::class, 'destroy'])->name('figures.destroy');
+
+    // Write access: admin only
+    Route::middleware('is_admin')->group(function () {
+        Route::post('/paints', [PaintController::class, 'store']);
+        Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');
+        Route::delete('/paints/{paint}', [PaintController::class, 'destroy'])->name('paints.destroy');
+
+        Route::post('/figures', [FigureController::class, 'store']);
+        Route::put('/figures/{figure}', [FigureController::class, 'update'])->name('figures.update');
+        Route::delete('/figures/{figure}', [FigureController::class, 'destroy'])->name('figures.destroy');
+    });
 });
