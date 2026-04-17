@@ -470,8 +470,14 @@
                     Ir a Figuras
                 </a>
             </div>
-            <button type="button" class="add-btn" onclick="openCreateModal()"
-                style="border: none; cursor: pointer;">Nueva Pintura</button>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button type="button" class="add-btn" onclick="openCreateModal()"
+                    style="border: none; cursor: pointer;">Nueva Pintura</button>
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar Sesión</button>
+                </form>
+            </div>
         </div>
 
         @if((isset($outOfStockCount) && $outOfStockCount > 0) || (isset($lowStockCount) && $lowStockCount > 0))
