@@ -20,6 +20,9 @@ Route::middleware('auth')->group(function () {
 
     // Write access: admin only
     Route::middleware('is_admin')->group(function () {
+        Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+        Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
+
         Route::post('/paints', [PaintController::class, 'store']);
         Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');
         Route::delete('/paints/{paint}', [PaintController::class, 'destroy'])->name('paints.destroy');
