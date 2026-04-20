@@ -22,6 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('is_admin')->group(function () {
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
         Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
+        Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
 
         Route::post('/paints', [PaintController::class, 'store']);
         Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');

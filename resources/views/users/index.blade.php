@@ -406,14 +406,17 @@
                     style="border: none; cursor: pointer;">Nuevo Usuario</button>
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar Sesión</button>
+                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar
+                        Sesión</button>
                 </form>
             </div>
         </div>
 
         @if($errors->any())
-            <div style="background-color: #fceceb; border: 1px solid #fecaca; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px;">
-                <h4 style="margin: 0 0 8px 0; color: #b91c1c; font-size: 14px; font-weight: 600;">Hubo algunos problemas:</h4>
+            <div
+                style="background-color: #fceceb; border: 1px solid #fecaca; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px;">
+                <h4 style="margin: 0 0 8px 0; color: #b91c1c; font-size: 14px; font-weight: 600;">Hubo algunos problemas:
+                </h4>
                 <ul style="margin: 0; color: #dc2626; font-size: 14px; padding-left: 20px;">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -451,6 +454,7 @@
                         <th>Correo Electrónico</th>
                         <th>Rol</th>
                         <th>Fecha de Creación</th>
+                        <th style="text-align: right;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -467,10 +471,25 @@
                                 @endif
                             </td>
                             <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                            <td style="text-align: right;">
+                                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                    <button type="button" class="edit-btn" onclick="openEditModal({{ $user->toJson() }})"
+                                        style="border: none; cursor: pointer; color: var(--primary-color);">Editar</button>
+                                    @if(auth()->id() !== $user->id)
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST" style="margin: 0;"
+                                            onsubmit="return confirmDelete(event, this)">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="edit-btn"
+                                                style="border: none; cursor: pointer; color: #d93d3b;">Eliminar</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
                                 No se encontraron usuarios.
                             </td>
                         </tr>
@@ -496,40 +515,53 @@
             });
         @endif
 
-        function getFormHtml() {
-            return `
-            <form method="POST" action="/users" id="userForm">
+            function getFormHtml(user = null) {
+                const isEdit = user !== null;
+                const actionUrl = isEdit ? `/users/${user.id}` : '/users';
+                const methodField = isEdit ? '@method("PUT")' : '';
+                const titleText = isEdit ? 'Actualizar Usuario' : 'Crear Usuario';
+
+                const name = isEdit ? user.name : '';
+                const email = isEdit ? user.email : '';
+                const role = isEdit ? user.role : 'user';
+
+                const pwdPlaceholder = isEdit ? 'Dejar en blanco para no cambiar' : 'Mínimo 8 caracteres';
+                const pwdRequired = isEdit ? '' : 'required';
+
+                return `
+            <form method="POST" action="${actionUrl}" id="userForm">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                ${methodField}
                 
                 <div class="form-group">
                     <label for="name">Nombre</label>
-                    <input id="name" name="name" type="text" placeholder="Ej. Juan Pérez" required>
+                    <input id="name" name="name" type="text" value="${name}" placeholder="Ej. Juan Pérez" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Correo Electrónico</label>
-                    <input id="email" name="email" type="email" placeholder="Ej. juan@ejemplo.com" required>
+                    <input id="email" name="email" type="email" value="${email}" placeholder="Ej. juan@ejemplo.com" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="password">Contraseña</label>
-                        <input id="password" name="password" type="text" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                        <input id="password" name="password" type="text" placeholder="${pwdPlaceholder}" minlength="8" ${pwdRequired}>
                     </div>
 
                     <div class="form-group">
                         <label for="role">Rol</label>
                         <select id="role" name="role" required>
-                            <option value="user" selected>Normal</option>
-                            <option value="admin">Administrador</option>
+                            <option value="user" ${role === 'user' ? 'selected' : ''}>Normal</option>
+                            <option value="admin" ${role === 'admin' ? 'selected' : ''}>Administrador</option>
                         </select>
                     </div>
                 </div>
 
-                <button type="submit" class="swal-submit-btn">Crear Usuario</button>
+                <button type="submit" class="swal-submit-btn">${titleText}</button>
             </form>
             `;
-        }
+            }
 
         function openCreateModal() {
             Swal.fire({
@@ -540,6 +572,42 @@
                 customClass: {
                     popup: 'swal2-popup',
                     htmlContainer: 'swal2-html-container-form'
+                }
+            });
+        }
+
+        function openEditModal(user) {
+            Swal.fire({
+                title: 'Editar Usuario',
+                html: getFormHtml(user),
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: {
+                    popup: 'swal2-popup',
+                    htmlContainer: 'swal2-html-container-form'
+                }
+            });
+        }
+
+        function confirmDelete(event, form) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "No podrás revertir esto. El usuario será eliminado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d93d3b',
+                cancelButtonColor: '#86868b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'swal2-popup',
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
                 }
             });
         }
