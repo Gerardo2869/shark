@@ -521,6 +521,7 @@
                     <button type="button" class="add-btn" onclick="openCreateModal()"
                         style="border: none; cursor: pointer;">Nueva Figura</button>
                 @endif
+                <a href="{{ route('profile.edit') }}" class="edit-btn" style="border: none; cursor: pointer; color: var(--text-color);">Mi Perfil</a>
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
                     <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar Sesión</button>

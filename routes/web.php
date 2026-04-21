@@ -18,6 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/paints', [PaintController::class, 'index'])->name('paints.index');
     Route::get('/figures', [FigureController::class, 'index'])->name('figures.index');
 
+    // Profile access
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
     // Write access: admin only
     Route::middleware('is_admin')->group(function () {
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
