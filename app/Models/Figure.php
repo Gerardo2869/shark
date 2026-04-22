@@ -19,4 +19,12 @@ class Figure extends Model
         'price',
         'is_active',
     ];
+
+    /**
+     * Get all of the figure's sale items.
+     */
+    public function saleItems()
+    {
+        return $this->morphMany(SaleItem::class, 'sellable');
+    }
 }
