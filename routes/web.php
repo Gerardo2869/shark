@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaintController;
 use App\Http\Controllers\FigureController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SaleController;
 
 Route::get('/', function () {
     return redirect('/paints');
@@ -17,6 +18,10 @@ Route::middleware('auth')->group(function () {
     // Read access: auth users
     Route::get('/paints', [PaintController::class, 'index'])->name('paints.index');
     Route::get('/figures', [FigureController::class, 'index'])->name('figures.index');
+
+    // Sales
+    Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+    Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
 
     // Profile access
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
