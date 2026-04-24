@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
 
     // Sales
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+    Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
     Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
 
     // Profile access

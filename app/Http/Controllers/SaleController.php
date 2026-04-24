@@ -25,6 +25,17 @@ class SaleController extends Controller
     }
 
     /**
+     * Show the form for creating a new sale.
+     */
+    public function create()
+    {
+        $paints = Paint::where('is_active', true)->where('stock', '>', 0)->get();
+        $figures = Figure::where('is_active', true)->where('stock', '>', 0)->get();
+
+        return view('sales.create', compact('paints', 'figures'));
+    }
+
+    /**
      * Store a newly created sale in storage.
      */
     public function store(Request $request)
