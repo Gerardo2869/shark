@@ -134,6 +134,38 @@
             background-color: #f5f5f7;
             color: #1d1d1f;
         }
+
+        .product-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-item {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: normal;
+            max-width: 300px;
+        }
+
+        .product-qty {
+            font-weight: 600;
+            color: var(--text-color);
+            background-color: #f0f0f2;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        td {
+            vertical-align: top;
+        }
     </style>
 </head>
 
@@ -157,13 +189,15 @@
                 <a href="{{ route('profile.edit') }}" class="edit-btn" style="color: var(--text-color);">Mi Perfil</a>
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar Sesión</button>
+                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar
+                        Sesión</button>
                 </form>
             </div>
         </div>
 
         @if (session('success'))
-            <div style="background-color: #e5f6e8; border: 1px solid #ccebd2; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; color: #1a7a36; font-size: 14px;">
+            <div
+                style="background-color: #e5f6e8; border: 1px solid #ccebd2; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; color: #1a7a36; font-size: 14px;">
                 {{ session('success') }}
             </div>
         @endif
@@ -186,9 +220,20 @@
                             <td>{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                             <td>{{ $sale->user->name }}</td>
                             <td>
-                                <span class="status-badge">
-                                    {{ $sale->items->count() }} {{ $sale->items->count() == 1 ? 'artículo' : 'artículos' }}
-                                </span>
+                                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                    <span class="status-badge">
+                                        {{ $sale->items->count() }}
+                                        {{ $sale->items->count() == 1 ? 'artículo' : 'artículos' }}
+                                    </span>
+                                    <ul class="product-list">
+                                        @foreach($sale->items as $item)
+                                            <li class="product-item">
+                                                <span class="product-qty">{{ $item->quantity }}x</span>
+                                                <span>{{ $item->sellable->name ?? 'Producto no encontrado' }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
                             </td>
                             <td class="amount">${{ number_format($sale->total_amount, 2) }}</td>
                         </tr>
