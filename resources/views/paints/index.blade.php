@@ -452,6 +452,16 @@
         .pill-btn {
             border-radius: 20px;
         }
+
+        .color-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(0,0,0,0.1);
+            vertical-align: middle;
+            margin-right: 8px;
+        }
     </style>
 </head>
 
@@ -639,7 +649,14 @@
                     @forelse($paints as $paint)
                         <tr>
                             <td>{{ $paint->id }}</td>
-                            <td><strong>{{ $paint->name }}</strong></td>
+                             <td>
+                                <div style="display: flex; align-items: center;">
+                                    @if($paint->hex_color)
+                                        <span class="color-circle" style="background-color: {{ $paint->hex_color }};"></span>
+                                    @endif
+                                    <strong>{{ $paint->name }}</strong>
+                                </div>
+                            </td>
                             <td>{{ $paint->brand }}</td>
                             <td style="text-transform: capitalize;">{{ $paint->color_type }}</td>
                             <td>{{ $paint->ml ? $paint->ml . ' ml' : 'N/A' }}</td>
@@ -735,9 +752,18 @@
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 ${paint ? '<input type="hidden" name="_method" value="PUT">' : ''}
                 
-                <div class="form-group">
-                    <label for="name">Nombre</label>
-                    <input id="name" name="name" type="text" placeholder="Ej. Macragge Blue" required value="${paint && paint.name ? paint.name.replace(/"/g, '&quot;') : ''}">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="name">Nombre</label>
+                        <input id="name" name="name" type="text" placeholder="Ej. Macragge Blue" required value="${paint && paint.name ? paint.name.replace(/"/g, '&quot;') : ''}">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="hex_color">Color (Opcional)</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input id="hex_color" name="hex_color" type="text" placeholder="#000000" value="${paint && paint.hex_color ? paint.hex_color : ''}" style="flex: 1;">
+                            <input type="color" value="${paint && paint.hex_color ? paint.hex_color : '#000000'}" style="width: 46px; height: 46px; padding: 4px; border-radius: 12px; cursor: pointer;" oninput="document.getElementById('hex_color').value = this.value">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-row">

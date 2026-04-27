@@ -10,6 +10,7 @@ class Paint extends Model
         'name',
         'brand',
         'color_type',
+        'hex_color',
         'stock',
         'price',
         'expiration_date',

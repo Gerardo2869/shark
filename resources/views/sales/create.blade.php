@@ -581,8 +581,12 @@
                 if (type === 'figure' && item.image) {
                     thumbHtml = `<img src="${storageUrl + item.image}" class="option-thumb" alt="">`;
                 } else if (type === 'paint') {
-                    // Placeholder for paint
-                    thumbHtml = `<div class="option-thumb" style="background: var(--primary-color); opacity: 0.1;"></div>`;
+                    // Placeholder for paint or actual color
+                    if (item.hex_color) {
+                        thumbHtml = `<div class="option-thumb" style="background: ${item.hex_color}; border: 1px solid rgba(0,0,0,0.1);"></div>`;
+                    } else {
+                        thumbHtml = `<div class="option-thumb" style="background: var(--primary-color); opacity: 0.1;"></div>`;
+                    }
                 }
 
                 option.innerHTML = `
