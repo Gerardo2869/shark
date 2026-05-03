@@ -320,6 +320,10 @@
                     style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px;">
                     Ir a Figuras
                 </a>
+                <a href="{{ url('/quotes') }}"
+                    style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                    Ir a Cotizaciones
+                </a>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ route('sales.create') }}" class="add-btn">Nueva Venta</a>

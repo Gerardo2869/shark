@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
     Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
 
+    // Quotes
+    Route::resource('quotes', \App\Http\Controllers\QuoteController::class);
+    Route::post('/quotes/{quote}/convert', [\App\Http\Controllers\QuoteController::class, 'convertToSale'])->name('quotes.convert');
+
     // Profile access
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
