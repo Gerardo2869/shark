@@ -38,6 +38,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
         Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+        
+        // Audit Logs
+        Route::get('/audit', [\App\Http\Controllers\AuditController::class, 'index'])->name('audit.index');
 
         Route::post('/paints', [PaintController::class, 'store']);
         Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');

@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\LogsActivity;
+
 class Quote extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
 
     protected $fillable = [
         'user_id',

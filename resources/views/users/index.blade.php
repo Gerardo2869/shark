@@ -410,6 +410,14 @@
                     </svg>
                     Volver a Pinturas
                 </a>
+                <a href="{{ url('/audit') }}"
+                    style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-left: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    Auditoría
+                </a>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <button type="button" class="add-btn" onclick="openCreateModal()"
