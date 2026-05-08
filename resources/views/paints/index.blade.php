@@ -513,6 +513,16 @@
                         Auditoría
                     </a>
                 @endif
+                <a href="{{ route('catalog.index') }}"
+                    style="font-size: 14px; color: #86868b; text-decoration: none; display: flex; align-items: center; gap: 4px; margin-left: 16px; border-left: 1px solid #d2d2d7; padding-left: 16px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    Ver Catálogo Público
+                </a>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 @if(auth()->user()->isAdmin())

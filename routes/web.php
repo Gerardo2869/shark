@@ -6,9 +6,13 @@ use App\Http\Controllers\FigureController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SaleController;
 
+use App\Http\Controllers\PublicCatalogController;
+
 Route::get('/', function () {
-    return redirect('/paints');
+    return redirect('/catalogo');
 });
+
+Route::get('/catalogo', [PublicCatalogController::class, 'index'])->name('catalog.index');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');

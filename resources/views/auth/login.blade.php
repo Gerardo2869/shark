@@ -191,7 +191,16 @@
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
             </button>
-        </form>
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+            <a href="{{ route('catalog.index') }}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                Ver Catálogo Público (Modo Invitado)
+            </a>
+        </div>
     </div>
 </body>
 
