@@ -25,7 +25,7 @@ class PublicCatalogController extends Controller
                     'stock' => $item->stock,
                     'category' => $item->faction ?: 'General',
                     'type' => 'Figura',
-                    'image' => $item->image ? asset('storage/' . $item->image) : null,
+                    'image' => $item->image ? (filter_var($item->image, FILTER_VALIDATE_URL) ? $item->image : asset('storage/' . $item->image)) : null,
                     'hex_color' => null,
                 ];
             });
