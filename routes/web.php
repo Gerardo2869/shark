@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SaleController;
 
 use App\Http\Controllers\PublicCatalogController;
+use App\Http\Controllers\BundleController;
 
 Route::get('/', function () {
     return redirect('/catalogo');
@@ -45,6 +46,9 @@ Route::middleware('auth')->group(function () {
         
         // Audit Logs
         Route::get('/audit', [\App\Http\Controllers\AuditController::class, 'index'])->name('audit.index');
+
+        // Bundles
+        Route::resource('bundles', BundleController::class);
 
         Route::post('/paints', [PaintController::class, 'store']);
         Route::put('/paints/{paint}', [PaintController::class, 'update'])->name('paints.update');
