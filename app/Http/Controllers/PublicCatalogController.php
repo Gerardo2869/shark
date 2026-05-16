@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Figure;
 use App\Models\Paint;
+use App\Models\Bundle;
 use Illuminate\Http\Request;
 
 class PublicCatalogController extends Controller
@@ -27,6 +28,7 @@ class PublicCatalogController extends Controller
                     'type' => 'Figura',
                     'image' => $item->image ? (filter_var($item->image, FILTER_VALIDATE_URL) ? $item->image : asset('storage/' . $item->image)) : null,
                     'hex_color' => null,
+                    'is_bundle' => false,
                 ];
             });
 
@@ -44,11 +46,30 @@ class PublicCatalogController extends Controller
                     'type' => 'Pintura',
                     'image' => null,
                     'hex_color' => $item->hex_color,
+                    'is_bundle' => false,
                 ];
             });
 
-        // Combine and sort by latest (using standard created_at would be better if we had it, but for now we just merge)
-        $items = $figures->concat($paints)->shuffle(); // Shuffling for a dynamic look, or sort by name
+        // Fetch Bundles
+        $bundles = Bundle::where('is_active', true)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => 'bundle_' . $item->id,
+                    'name' => $item->name,
+                    'price' => $item->price,
+                    'stock' => null, // Bundles don't have direct stock
+                    'category' => 'Promoción',
+                    'type' => 'Paquete (Kit)',
+                    'image' => $item->image ? asset('storage/' . $item->image) : null,
+                    'hex_color' => null,
+                    'is_bundle' => true,
+                    'description' => $item->description,
+                ];
+            });
+
+        // Combine and sort
+        $items = $figures->concat($paints)->concat($bundles)->shuffle();
 
         return view('catalog.index', compact('items'));
     }

@@ -6,6 +6,7 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Paint;
 use App\Models\Figure;
+use App\Models\Bundle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -31,8 +32,9 @@ class SaleController extends Controller
     {
         $paints = Paint::where('is_active', true)->where('stock', '>', 0)->get();
         $figures = Figure::where('is_active', true)->where('stock', '>', 0)->get();
+        $bundles = Bundle::where('is_active', true)->with('items.sellable')->get();
 
-        return view('sales.create', compact('paints', 'figures'));
+        return view('sales.create', compact('paints', 'figures', 'bundles'));
     }
 
     /**
@@ -43,7 +45,7 @@ class SaleController extends Controller
         $request->validate([
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|integer',
-            'items.*.type' => 'required|string|in:paint,figure',
+            'items.*.type' => 'required|string|in:paint,figure,bundle',
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
@@ -53,27 +55,59 @@ class SaleController extends Controller
                 $itemsToCreate = [];
 
                 foreach ($request->items as $itemData) {
-                    $modelClass = $itemData['type'] === 'paint' ? Paint::class : Figure::class;
-                    $item = $modelClass::lockForUpdate()->findOrFail($itemData['id']);
+                    if ($itemData['type'] === 'bundle') {
+                        $bundle = Bundle::with('items.sellable')->findOrFail($itemData['id']);
+                        
+                        // Validate stock for all components in the bundle
+                        foreach ($bundle->items as $bundleItem) {
+                            $component = $bundleItem->sellable()->lockForUpdate()->first();
+                            $neededQty = $bundleItem->quantity * $itemData['quantity'];
+                            
+                            if ($component->stock < $neededQty) {
+                                throw new \Exception("Stock insuficiente para: {$component->name} (requerido por el paquete {$bundle->name}). Disponible: {$component->stock}, Requerido: {$neededQty}");
+                            }
+                        }
 
-                    // Validate stock
-                    if ($item->stock < $itemData['quantity']) {
-                        throw new \Exception("Stock insuficiente para: {$item->name}. Disponible: {$item->stock}");
+                        // Deduct stock for all components
+                        foreach ($bundle->items as $bundleItem) {
+                            $component = $bundleItem->sellable;
+                            $neededQty = $bundleItem->quantity * $itemData['quantity'];
+                            $component->decrement('stock', $neededQty);
+                        }
+
+                        $subtotal = $bundle->price * $itemData['quantity'];
+                        $totalAmount += $subtotal;
+
+                        $itemsToCreate[] = [
+                            'sellable_type' => Bundle::class,
+                            'sellable_id' => $bundle->id,
+                            'quantity' => $itemData['quantity'],
+                            'unit_price' => $bundle->price,
+                            'subtotal' => $subtotal,
+                        ];
+                    } else {
+                        $modelClass = $itemData['type'] === 'paint' ? Paint::class : Figure::class;
+                        $item = $modelClass::lockForUpdate()->findOrFail($itemData['id']);
+
+                        // Validate stock
+                        if ($item->stock < $itemData['quantity']) {
+                            throw new \Exception("Stock insuficiente para: {$item->name}. Disponible: {$item->stock}");
+                        }
+
+                        $subtotal = $item->price * $itemData['quantity'];
+                        $totalAmount += $subtotal;
+
+                        $itemsToCreate[] = [
+                            'sellable_type' => $modelClass,
+                            'sellable_id' => $item->id,
+                            'quantity' => $itemData['quantity'],
+                            'unit_price' => $item->price,
+                            'subtotal' => $subtotal,
+                        ];
+
+                        // Decrease stock
+                        $item->decrement('stock', $itemData['quantity']);
                     }
-
-                    $subtotal = $item->price * $itemData['quantity'];
-                    $totalAmount += $subtotal;
-
-                    $itemsToCreate[] = [
-                        'sellable_type' => $modelClass,
-                        'sellable_id' => $item->id,
-                        'quantity' => $itemData['quantity'],
-                        'unit_price' => $item->price,
-                        'subtotal' => $subtotal,
-                    ];
-
-                    // Decrease stock
-                    $item->decrement('stock', $itemData['quantity']);
                 }
 
                 // Create the sale header

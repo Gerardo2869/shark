@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -159,15 +160,19 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>Crear Nuevo Paquete</h1>
-            <a href="{{ route('bundles.index') }}" style="font-size: 14px; color: var(--primary-color); text-decoration: none;">&larr; Volver a la lista</a>
+            <a href="{{ route('bundles.index') }}"
+                style="font-size: 14px; color: var(--primary-color); text-decoration: none;">&larr; Volver a la
+                lista</a>
         </div>
 
         @if($errors->any())
-            <div style="background-color: #fceceb; color: #d93d3b; padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 14px;">
+            <div
+                style="background-color: #fceceb; color: #d93d3b; padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 14px;">
                 <ul>
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -178,20 +183,23 @@
 
         <form action="{{ route('bundles.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            
+
             <div class="form-group">
                 <label for="name">Nombre del Paquete</label>
-                <input type="text" name="name" id="name" class="form-control" placeholder="Ej. Set de Inicio Guerrero" value="{{ old('name') }}" required>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Ej. Set de Inicio Guerrero"
+                    value="{{ old('name') }}" required>
             </div>
 
             <div class="form-group">
                 <label for="description">Descripción</label>
-                <textarea name="description" id="description" class="form-control" rows="3" placeholder="Describe qué incluye y por qué es una gran oferta...">{{ old('description') }}</textarea>
+                <textarea name="description" id="description" class="form-control" rows="3"
+                    placeholder="Describe qué incluye y por qué es una gran oferta...">{{ old('description') }}</textarea>
             </div>
 
             <div class="form-group">
                 <label for="price">Precio Especial ($)</label>
-                <input type="number" name="price" id="price" class="form-control" step="0.01" placeholder="99.99" value="{{ old('price') }}" required>
+                <input type="number" name="price" id="price" class="form-control" step="0.01" placeholder="99.99"
+                    value="{{ old('price') }}" required>
             </div>
 
             <div class="form-group">
@@ -200,20 +208,30 @@
             </div>
 
             <div class="items-section">
-                <h3>Componentes del Paquete</h3>
-                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0;">Componentes del Paquete</h3>
+                    <div
+                        style="text-align: right; background: #e5f0fa; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--primary-color);">
+                        <span
+                            style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 2px;">Valor
+                            Total:</span>
+                        <strong style="font-size: 18px; color: var(--primary-color);"
+                            id="total-suggested-value">$0.00</strong>
+                    </div>
+                </div>
+
                 <div class="add-item-controls">
                     <select id="item-type" class="form-control" style="width: 150px;">
                         <option value="figure">Figura</option>
                         <option value="paint">Pintura</option>
                     </select>
-                    
+
                     <select id="item-selector" class="form-control">
                         <!-- Populated by JS -->
                     </select>
-                    
+
                     <input type="number" id="item-qty" class="form-control" style="width: 80px;" value="1" min="1">
-                    
+
                     <button type="button" class="btn btn-secondary" onclick="addItem()">Añadir</button>
                 </div>
 
@@ -229,18 +247,21 @@
     <script>
         const figures = @json($figures);
         const paints = @json($paints);
-        
+
         const typeSelector = document.getElementById('item-type');
         const itemSelector = document.getElementById('item-selector');
         const itemsList = document.getElementById('items-list');
+        const suggestedValueDisplay = document.getElementById('total-suggested-value');
+
         let itemIndex = 0;
+        let totalSuggestedValue = 0;
 
         function updateItemSelector() {
             const type = typeSelector.value;
             const source = type === 'figure' ? figures : paints;
-            
-            itemSelector.innerHTML = source.map(item => 
-                `<option value="${item.id}">${item.name} ($${item.price})</option>`
+
+            itemSelector.innerHTML = source.map(item =>
+                `<option value="${item.id}" data-price="${item.price}">${item.name} ($${item.price})</option>`
             ).join('');
         }
 
@@ -250,32 +271,48 @@
         function addItem() {
             const type = typeSelector.value;
             const itemId = itemSelector.value;
-            const itemName = itemSelector.options[itemSelector.selectedIndex].text;
-            const qty = document.getElementById('item-qty').value;
+            const selectedOption = itemSelector.options[itemSelector.selectedIndex];
+            const itemName = selectedOption.text;
+            const itemPrice = parseFloat(selectedOption.getAttribute('data-price'));
+            const qty = parseInt(document.getElementById('item-qty').value);
 
             if (!itemId) return;
+
+            const subtotal = itemPrice * qty;
+            totalSuggestedValue += subtotal;
+            updateSuggestedValue();
 
             const row = document.createElement('div');
             row.className = 'item-row';
             row.id = `item-row-${itemIndex}`;
+            row.setAttribute('data-subtotal', subtotal);
             row.innerHTML = `
                 <div class="item-info">
                     <strong>${itemName}</strong>
-                    <span style="color: var(--text-muted); margin-left: 8px;">x ${qty}</span>
+                    <span style="color: var(--text-muted); margin-left: 8px;">x ${qty} ($${subtotal.toFixed(2)})</span>
                     <input type="hidden" name="items[${itemIndex}][id]" value="${itemId}">
                     <input type="hidden" name="items[${itemIndex}][type]" value="${type}">
                     <input type="hidden" name="items[${itemIndex}][quantity]" value="${qty}">
                 </div>
                 <button type="button" class="remove-btn" onclick="removeItem(${itemIndex})">Quitar</button>
             `;
-            
+
             itemsList.appendChild(row);
             itemIndex++;
         }
 
         function removeItem(index) {
-            document.getElementById(`item-row-${index}`).remove();
+            const row = document.getElementById(`item-row-${index}`);
+            const subtotal = parseFloat(row.getAttribute('data-subtotal'));
+            totalSuggestedValue -= subtotal;
+            updateSuggestedValue();
+            row.remove();
+        }
+
+        function updateSuggestedValue() {
+            suggestedValueDisplay.innerText = `$${totalSuggestedValue.toFixed(2)}`;
         }
     </script>
 </body>
+
 </html>

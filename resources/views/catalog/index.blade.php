@@ -138,6 +138,42 @@
             transform: scale(1.02);
         }
 
+        .contact-link {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(0, 113, 227, 0.1);
+            border: 1.5px solid rgba(0, 113, 227, 0.2);
+            transition: var(--transition);
+            position: relative;
+            animation: pulse-blue 2s infinite;
+        }
+
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 113, 227, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0); }
+        }
+
+        .contact-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 113, 227, 0.4);
+            border-color: var(--primary-color);
+            animation: none;
+        }
+
+        [data-theme="dark"] .contact-link {
+            background-color: rgba(0, 113, 227, 0.15);
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -304,6 +340,33 @@
             display: none;
         }
 
+        .promo-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #ff3b30 0%, #ff9500 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+            text-transform: uppercase;
+        }
+
+        .item-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
         /* Filter Bar Styles */
         .filter-container {
             display: flex;
@@ -409,6 +472,13 @@
                 </svg>
             </button>
 
+            <a href="https://www.twitch.tv/shadowshark2869" target="_blank" class="contact-link" title="Contactar para comprar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                <span>¡Haz tu pedido!</span>
+            </a>
+
             <a href="{{ route('login') }}" class="login-link">Iniciar Sesión</a>
         </div>
     </nav>
@@ -423,6 +493,7 @@
             <button class="filter-pill active" data-filter="all">Todo</button>
             <button class="filter-pill" data-filter="figura">Figuras</button>
             <button class="filter-pill" data-filter="pintura">Pinturas</button>
+            <button class="filter-pill" data-filter="paquete (kit)">Paquetes</button>
         </div>
 
         <div class="gallery-grid" id="galleryGrid">
@@ -430,6 +501,9 @@
                 <div class="item-card" data-name="{{ strtolower($item['name']) }}"
                     data-category="{{ strtolower($item['category']) }}" data-type="{{ strtolower($item['type']) }}">
                     <div class="image-container">
+                        @if($item['is_bundle'])
+                            <div class="promo-badge">Ahorro</div>
+                        @endif
                         @if($item['image'])
                             <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" loading="lazy">
                         @elseif($item['hex_color'])
@@ -447,9 +521,19 @@
                         <span class="item-type-tag">{{ $item['type'] }}</span>
                         <div class="item-category">{{ $item['category'] }}</div>
                         <h3 class="item-name">{{ $item['name'] }}</h3>
+
+                        @if($item['is_bundle'] && isset($item['description']))
+                            <div class="item-description">{{ $item['description'] }}</div>
+                        @endif
+
                         <div class="item-footer">
                             <span class="item-price">${{ number_format($item['price'], 2) }}</span>
-                            <span class="item-stock">{{ $item['stock'] }} en stock</span>
+                            @if(!$item['is_bundle'])
+                                <span class="item-stock">{{ $item['stock'] }} en stock</span>
+                            @else
+                                <span class="item-stock" style="background-color: #eef7ff; color: var(--primary-color);">Kit
+                                    Especial</span>
+                            @endif
                         </div>
                     </div>
                 </div>

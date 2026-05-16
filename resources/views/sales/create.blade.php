@@ -448,7 +448,8 @@
     <script>
         const inventory = {
             paint: @json($paints),
-            figure: @json($figures)
+            figure: @json($figures),
+            bundle: @json($bundles)
         };
 
         const storageUrl = "{{ asset('storage') }}/";
@@ -487,6 +488,7 @@
                         <option value="" disabled selected>Elegir...</option>
                         <option value="paint">Pintura</option>
                         <option value="figure">Figura</option>
+                        <option value="bundle">Paquete</option>
                     </select>
                 </div>
                 <div class="item-select-col">
@@ -578,7 +580,7 @@
                 const price = parseFloat(item.price) || 0;
 
                 let thumbHtml = '';
-                if (type === 'figure' && item.image) {
+                if ((type === 'figure' || type === 'bundle') && item.image) {
                     thumbHtml = `<img src="${storageUrl + item.image}" class="option-thumb" alt="">`;
                 } else if (type === 'paint') {
                     // Placeholder for paint or actual color
@@ -619,7 +621,7 @@
                 });
 
                 // Hover preview logic
-                if (type === 'figure' && item.image) {
+                if ((type === 'figure' || type === 'bundle') && item.image) {
                     option.addEventListener('mouseenter', () => {
                         hoverPreview.innerHTML = `<img src="${storageUrl + item.image}" alt="">`;
                         hoverPreview.style.display = 'block';
@@ -647,13 +649,18 @@
                     const price = parseFloat(item.price) || 0;
                     const subtotal = price * qty;
                     subtotalDisplay.textContent = `$${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-
-                    stockDisplay.innerHTML = `Stock disponible: <span class="${qty > item.stock ? 'stock-warning' : ''}">${item.stock}</span>`;
-
-                    if (qty > item.stock) {
-                        row.querySelector('.quantity-input').style.borderColor = 'var(--danger-color)';
-                    } else {
+                    
+                    if (type === 'bundle') {
+                        stockDisplay.innerHTML = `<span style="color: var(--text-muted); font-size: 10px;">Kit de ${item.items.length} productos</span>`;
                         row.querySelector('.quantity-input').style.borderColor = 'var(--border-color)';
+                    } else {
+                        stockDisplay.innerHTML = `Stock disponible: <span class="${qty > item.stock ? 'stock-warning' : ''}">${item.stock}</span>`;
+
+                        if (qty > item.stock) {
+                            row.querySelector('.quantity-input').style.borderColor = 'var(--danger-color)';
+                        } else {
+                            row.querySelector('.quantity-input').style.borderColor = 'var(--border-color)';
+                        }
                     }
                 }
             } else {
@@ -701,13 +708,15 @@
                 const id = row.querySelector('.item-id-input').value;
                 const qty = parseInt(row.querySelector('.quantity-input').value) || 0;
 
-                if (type && id) {
+                if (type && id && type !== 'bundle') {
                     const item = inventory[type].find(i => i.id == id);
                     if (item && qty > item.stock) {
                         hasError = true;
                         errorMessage = `Stock insuficiente para ${item.name}.`;
                     }
                 }
+                // For bundles, we could add a check here but the backend will handle it securely.
+                // Optionally we could iterate through components here too.
             });
 
             if (hasError) {
