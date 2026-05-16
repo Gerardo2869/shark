@@ -8,6 +8,7 @@ use App\Http\Controllers\SaleController;
 
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\BundleController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect('/catalogo');
@@ -39,6 +40,8 @@ Route::middleware('auth')->group(function () {
 
     // Write access: admin only
     Route::middleware('is_admin')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+        
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
         Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
         Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
