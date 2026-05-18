@@ -279,28 +279,15 @@
     <div class="container">
         <div class="header">
             <div style="display: flex; align-items: center; gap: 16px;">
+                <a href="{{ route('admin.dashboard') }}"
+                    style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; background: #f2f2f7; padding: 8px 16px; border-radius: 12px; transition: all 0.2s ease; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                    Dashboard
+                </a>
                 <h1>Cotizaciones</h1>
-                <a href="{{ url('/paints') }}" style="font-size: 14px; color: var(--primary-color); text-decoration: none;">Pinturas</a>
-                <a href="{{ url('/figures') }}" style="font-size: 14px; color: var(--primary-color); text-decoration: none;">Figuras</a>
-                <a href="{{ url('/sales') }}" style="font-size: 14px; color: var(--primary-color); text-decoration: none;">Ventas</a>
-                @if(auth()->user()->isAdmin())
-                    <a href="{{ url('/audit') }}"
-                        style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-left: 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/>
-                        </svg>
-                        Auditoría
-                    </a>
-                    <a href="{{ url('/users') }}"
-                        style="font-size: 14px; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-left: 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line>
-                        </svg>
-                        Usuarios
-                    </a>
-                @endif
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ route('quotes.create') }}" class="add-btn">Nueva Cotización</a>
