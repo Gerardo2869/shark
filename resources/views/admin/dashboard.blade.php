@@ -255,29 +255,31 @@
                 </div>
             </a>
 
-            <!-- Paquetes -->
-            <a href="{{ route('bundles.index') }}" class="module-card">
-                <div class="module-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path
-                            d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 5 2.5h13.5A2.5 2.5 0 0 1 21 5v11.5z" />
-                        <path d="M12 2v17" />
-                        <path d="M3 12h18" />
-                    </svg>
-                </div>
-                <div class="module-info">
-                    <h2>Paquetes</h2>
-                    <p>Kits y ofertas de ahorro.</p>
-                </div>
-                <div class="arrow-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </div>
-            </a>
+            @if(auth()->check() && auth()->user()->isAdmin())
+                <!-- Paquetes -->
+                <a href="{{ route('bundles.index') }}" class="module-card">
+                    <div class="module-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5a2.5 2.5 0 0 1-2.5-2.5V5A2.5 2.5 0 0 1 5 2.5h13.5A2.5 2.5 0 0 1 21 5v11.5z" />
+                            <path d="M12 2v17" />
+                            <path d="M3 12h18" />
+                        </svg>
+                    </div>
+                    <div class="module-info">
+                        <h2>Paquetes</h2>
+                        <p>Kits y ofertas de ahorro.</p>
+                    </div>
+                    <div class="arrow-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </div>
+                </a>
+            @endif
 
             <!-- Ventas -->
             <a href="{{ route('sales.index') }}" class="module-card">
@@ -328,26 +330,28 @@
         </div>
 
         <div class="secondary-section">
-            <h3>Administración</h3>
+            <h3>{{ auth()->check() && auth()->user()->isAdmin() ? 'Administración' : 'Enlaces' }}</h3>
             <div class="small-grid">
-                <a href="{{ route('audit.index') }}" class="small-card">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span>Auditoría</span>
-                </a>
-                <a href="{{ route('users.index') }}" class="small-card">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span>Usuarios</span>
-                </a>
+                @if(auth()->check() && auth()->user()->isAdmin())
+                    <a href="{{ route('audit.index') }}" class="small-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>Auditoría</span>
+                    </a>
+                    <a href="{{ route('users.index') }}" class="small-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Usuarios</span>
+                    </a>
+                @endif
                 <a href="{{ route('catalog.index') }}" target="_blank" class="small-card">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
