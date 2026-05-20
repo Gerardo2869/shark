@@ -61,6 +61,108 @@
             width: 100%;
         }
 
+        /* --- KPI WIDGETS --- */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.03);
+            transition: var(--transition);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .kpi-icon {
+            color: var(--primary-color);
+            opacity: 0.8;
+            background-color: rgba(0, 113, 227, 0.1);
+            padding: 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-icon.danger {
+            color: #ff3b30;
+            background-color: rgba(255, 59, 48, 0.1);
+        }
+
+        .kpi-icon.warning {
+            color: #ff9500;
+            background-color: rgba(255, 149, 0, 0.1);
+        }
+
+        .kpi-icon.success {
+            color: #34c759;
+            background-color: rgba(52, 199, 89, 0.1);
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-color);
+            letter-spacing: -0.02em;
+            margin: 4px 0;
+        }
+
+        .kpi-trend {
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            width: fit-content;
+        }
+
+        .kpi-trend.positive {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: #248a3d;
+        }
+
+        .kpi-trend.neutral {
+            background-color: rgba(142, 142, 147, 0.1);
+            color: #8e8e93;
+        }
+
+        .kpi-trend.negative {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: #c93429;
+        }
+
+        .kpi-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
         .module-card {
             background-color: var(--card-bg);
             border-radius: 28px;
@@ -206,6 +308,112 @@
             <h1>Command Center</h1>
             <p>Gestiona tu inventario y ventas con precisión.</p>
         </header>
+
+        <!-- WIDGETS KPI -->
+        <div class="kpi-grid">
+            <!-- Ventas del Mes -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Ventas del Mes</span>
+                    <div class="kpi-icon success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value">${{ number_format($ventasMesActual, 2) }} <span
+                        style="font-size: 16px; color: var(--text-muted);">MXN</span></div>
+                @if($porcentajeVentas > 0)
+                    <div class="kpi-trend positive">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                            <polyline points="16 7 22 7 22 13"></polyline>
+                        </svg>
+                        +{{ number_format($porcentajeVentas, 1) }}% vs mes anterior
+                    </div>
+                @elseif($porcentajeVentas < 0)
+                    <div class="kpi-trend negative">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline>
+                            <polyline points="16 17 22 17 22 11"></polyline>
+                        </svg>
+                        {{ number_format($porcentajeVentas, 1) }}% vs mes anterior
+                    </div>
+                @else
+                    <div class="kpi-trend neutral">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Sin cambios
+                    </div>
+                @endif
+            </div>
+
+            <!-- Stock Crítico -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Stock Crítico</span>
+                    <div class="kpi-icon danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                            </path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value" style="{{ $stockCritico > 0 ? 'color: #ff3b30;' : '' }}">{{ $stockCritico }}
+                </div>
+                @if($stockCritico > 0)
+                    <div class="kpi-subtitle">Productos por debajo del umbral para reabastecer.</div>
+                @else
+                    <div class="kpi-subtitle">Inventario en óptimas condiciones.</div>
+                @endif
+            </div>
+
+            <!-- Cotizaciones Activas -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Cotizaciones Activas</span>
+                    <div class="kpi-icon warning">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value">{{ $cotizacionesActivas }}</div>
+                <div class="kpi-subtitle">Presupuestos pendientes de cierre o seguimiento.</div>
+            </div>
+
+            <!-- Inventario Total -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Inventario Total</span>
+                    <div class="kpi-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="22"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value">${{ number_format($inventarioTotal, 2) }} <span
+                        style="font-size: 16px; color: var(--text-muted);">MXN</span></div>
+                <div class="kpi-subtitle">Valor total en dinero de todo tu stock actual.</div>
+            </div>
+        </div>
 
         <div class="launchpad-grid">
             <!-- Figuras -->
