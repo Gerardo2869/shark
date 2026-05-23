@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Shark Inventory</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -290,6 +291,51 @@
             color: white;
         }
 
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.03);
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .chart-header p {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
         @media (max-width: 768px) {
             .launchpad-grid {
                 grid-template-columns: 1fr;
@@ -412,6 +458,31 @@
                 <div class="kpi-value">${{ number_format($inventarioTotal, 2) }} <span
                         style="font-size: 16px; color: var(--text-muted);">MXN</span></div>
                 <div class="kpi-subtitle">Valor total en dinero de todo tu stock actual.</div>
+            </div>
+        </div>
+
+        <!-- GRÁFICOS VISUALES -->
+        <div class="charts-grid">
+            <!-- Gráfico de Tendencia de Ventas -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Tendencia de Ventas</h3>
+                    <p>Ingresos de los últimos 30 días</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico de Distribución de Inventario -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Distribución de Inventario</h3>
+                    <p>Proporción de artículos en stock</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -576,6 +647,124 @@
             <button type="submit" class="logout-btn">Cerrar Sesión</button>
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Datos pasados desde el DashboardController
+            const salesData = {!! $ventasUltimos30Dias !!};
+            const inventoryData = {!! $distribucionInventario !!};
+
+            // Gráfico de Tendencia de Ventas (Curva Suave)
+            const ctxSales = document.getElementById('salesChart').getContext('2d');
+
+            // Gradiente para rellenar bajo la curva
+            const salesGradient = ctxSales.createLinearGradient(0, 0, 0, 300);
+            salesGradient.addColorStop(0, 'rgba(0, 113, 227, 0.2)');
+            salesGradient.addColorStop(1, 'rgba(0, 113, 227, 0)');
+
+            new Chart(ctxSales, {
+                type: 'line',
+                data: {
+                    labels: salesData.labels,
+                    datasets: [{
+                        label: 'Ingresos',
+                        data: salesData.data,
+                        borderColor: '#0071e3', // Azul primario
+                        backgroundColor: salesGradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#0071e3',
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4 // Curva suave
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }, // Ocultamos leyenda por estética
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            titleFont: { size: 13, family: "sans-serif" },
+                            bodyFont: { size: 14, weight: 'bold', family: "sans-serif" },
+                            displayColors: false,
+                            callbacks: {
+                                label: function (context) {
+                                    return '$' + context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' MXN';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { maxTicksLimit: 7, color: '#86868b' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0,0,0,0.03)', drawBorder: false },
+                            ticks: {
+                                color: '#86868b',
+                                callback: function (value) { return '$' + value; }
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
+                }
+            });
+
+            // Gráfico de Distribución de Inventario (Dona sutil)
+            const ctxInventory = document.getElementById('inventoryChart').getContext('2d');
+            new Chart(ctxInventory, {
+                type: 'doughnut',
+                data: {
+                    labels: inventoryData.labels,
+                    datasets: [{
+                        data: inventoryData.data,
+                        backgroundColor: [
+                            '#0071e3', // Figuras: Azul
+                            '#34c759', // Pinturas: Verde
+                            '#ff9500'  // Paquetes: Naranja
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%', // Agujero interior grande para diseño sutil
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                color: '#1d1d1f',
+                                font: { size: 13, weight: '500' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (label) label += ': ';
+                                    label += context.parsed + ' items';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

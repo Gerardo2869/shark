@@ -23,6 +23,8 @@ class DashboardController extends Controller
             'stockCritico' => $this->stockCritico(),
             'cotizacionesActivas' => $this->cotizacionesActivas(),
             'inventarioTotal' => $this->inventarioTotal(),
+            'ventasUltimos30Dias' => json_encode($this->ventasUltimos30Dias()),
+            'distribucionInventario' => json_encode($this->distribucionInventario()),
         ]);
     }
 
@@ -116,5 +118,54 @@ class DashboardController extends Controller
 
             return $figuras + $pinturas;
         });
+    }
+
+    /**
+     * Obtiene las ventas agrupadas por fecha de los últimos 30 días.
+     */
+    private function ventasUltimos30Dias(): array
+    {
+        $hace30Dias = Carbon::now()->subDays(30)->startOfDay();
+
+        $ventas = Sale::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total_amount) as total'))
+            ->where('created_at', '>=', $hace30Dias)
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy(DB::raw('DATE(created_at)'), 'asc')
+            ->get();
+
+        // Rellenar días sin ventas con 0 para que la gráfica no tenga huecos
+        $fechas = [];
+        for ($i = 30; $i >= 0; $i--) {
+            $fecha = Carbon::now()->subDays($i)->format('Y-m-d');
+            $fechas[$fecha] = 0;
+        }
+
+        foreach ($ventas as $venta) {
+            $fechas[$venta->date] = (float) $venta->total;
+        }
+
+        return [
+            'labels' => array_keys($fechas),
+            'data' => array_values($fechas),
+        ];
+    }
+
+    /**
+     * Obtiene la distribución de stock entre los diferentes tipos de productos.
+     */
+    private function distribucionInventario(): array
+    {
+        $figuras = Figure::sum('stock') ?? 0;
+        $pinturas = Paint::sum('stock') ?? 0;
+        
+        // Los bundles no tienen columna 'stock', su disponibilidad depende de sus items.
+        // Por ahora, lo pondremos en 0 para no romper la gráfica, o podríamos contar 
+        // cuántos bundles distintos existen: Bundle::count();
+        $paquetes = Bundle::count();
+
+        return [
+            'labels' => ['Figuras', 'Pinturas', 'Paquetes'],
+            'data' => [$figuras, $pinturas, $paquetes],
+        ];
     }
 }
