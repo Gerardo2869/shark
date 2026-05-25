@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             FigureSeeder::class,
             PaintSeeder::class,
+            BundleSeeder::class,
             SaleSeeder::class,
             QuoteSeeder::class,
         ]);
