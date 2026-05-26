@@ -14,7 +14,7 @@ class BundleController extends Controller
 {
     public function index()
     {
-        $bundles = Bundle::with('items.sellable')->orderBy('created_at', 'desc')->paginate(10);
+        $bundles = Bundle::with('items.sellable')->orderBy('created_at', 'desc')->paginate(15);
         return view('bundles.index', compact('bundles'));
     }
 

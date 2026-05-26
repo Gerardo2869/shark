@@ -49,7 +49,7 @@ class PaintController extends Controller
             $query->orderBy('id', 'desc');
         }
 
-        $paints = $query->paginate(12);
+        $paints = $query->paginate(15);
 
         $outOfStockCount = Paint::where('stock', 0)->where('is_active', 1)->count();
         $lowStockCount = Paint::where('stock', '>', 0)->where('stock', '<=', 5)->where('is_active', 1)->count();

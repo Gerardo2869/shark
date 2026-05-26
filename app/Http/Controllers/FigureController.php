@@ -53,7 +53,7 @@ class FigureController extends Controller
             $query->orderBy('id', 'desc');
         }
 
-        $figures = $query->paginate(12);
+        $figures = $query->paginate(15);
 
         $outOfStockCount = Figure::where('stock', 0)->where('is_active', 1)->count();
         $lowStockCount = Figure::where('stock', '>', 0)->where('stock', '<=', 2)->where('is_active', 1)->count();

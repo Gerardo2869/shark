@@ -11,7 +11,7 @@ class AuditController extends Controller
     {
         $movements = Movement::with('user', 'movable')
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(15);
 
         return view('admin.audit.index', compact('movements'));
     }
