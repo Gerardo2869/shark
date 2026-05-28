@@ -21,6 +21,7 @@ class DashboardController extends Controller
             'ventasMesActual' => $this->ventasDelMes(),
             'porcentajeVentas' => $this->porcentajeCambioVentas(),
             'stockCritico' => $this->stockCritico(),
+            'listaStockCritico' => $this->listaStockCritico(),
             'cotizacionesActivas' => $this->cotizacionesActivas(),
             'inventarioTotal' => $this->inventarioTotal(),
             'ventasUltimos30Dias' => json_encode($this->ventasUltimos30Dias()),
@@ -90,6 +91,39 @@ class DashboardController extends Controller
 
             // Aquí puedes sumar Bundle::where(...)->count() cuando sea necesario
             return $figuras + $pinturas;
+        });
+    }
+
+    /**
+     * Devuelve la lista de productos con stock por debajo del umbral.
+     * Se cachea 5 minutos.
+     */
+    private function listaStockCritico()
+    {
+        return cache()->remember('lista_stock_critico', 300, function () {
+            $figuras = Figure::where('stock', '<', self::STOCK_CRITICO_UMBRAL)
+                ->select('name', 'stock')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'name' => $item->name,
+                        'stock' => $item->stock,
+                        'tipo' => 'Figura'
+                    ];
+                });
+
+            $pinturas = Paint::where('stock', '<', self::STOCK_CRITICO_UMBRAL)
+                ->select('name', 'stock')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'name' => $item->name,
+                        'stock' => $item->stock,
+                        'tipo' => 'Pintura'
+                    ];
+                });
+
+            return $figuras->concat($pinturas)->values()->all();
         });
     }
 

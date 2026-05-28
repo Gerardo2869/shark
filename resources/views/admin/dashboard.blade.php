@@ -375,6 +375,133 @@
                 font-size: 32px;
             }
         }
+
+        /* --- MODAL STOCK CRITICO --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .modal-close-btn {
+            background: rgba(128, 128, 128, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close-btn:hover {
+            background-color: rgba(128, 128, 128, 0.2);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .critical-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .critical-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: var(--bg-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+        }
+
+        .critical-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .critical-item-name {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 15px;
+        }
+
+        .critical-item-type {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .critical-item-stock {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -451,7 +578,7 @@
             </div>
 
             <!-- Stock Crítico -->
-            <div class="kpi-card">
+            <div class="kpi-card" id="stockCriticoCard" style="cursor: pointer;" title="Haz clic para ver detalles">
                 <div class="kpi-header">
                     <span>Stock Crítico</span>
                     <div class="kpi-icon danger">
@@ -849,6 +976,80 @@
         });
     </script>
 
+    <!-- MODAL STOCK CRITICO -->
+    <div class="modal-overlay" id="stockModalOverlay">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Detalle de Stock Crítico</h2>
+                <button class="modal-close-btn" id="closeStockModal" aria-label="Cerrar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if(isset($listaStockCritico) && count($listaStockCritico) > 0)
+                    <ul class="critical-list">
+                        @foreach($listaStockCritico as $item)
+                            <li class="critical-item">
+                                <div class="critical-item-info">
+                                    <span class="critical-item-name">{{ $item['name'] }}</span>
+                                    <span class="critical-item-type">{{ $item['tipo'] }}</span>
+                                </div>
+                                <span class="critical-item-stock">{{ $item['stock'] }} en stock</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div style="text-align: center; color: var(--text-muted); padding: 20px 0;">
+                        <svg style="margin-bottom: 12px; color: #34c759;" xmlns="http://www.w3.org/2000/svg" width="48"
+                            height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <p style="margin: 0; font-size: 15px;">Inventario en óptimas condiciones.</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lógica para el modal de stock crítico
+            const stockCard = document.getElementById('stockCriticoCard');
+            const modalOverlay = document.getElementById('stockModalOverlay');
+            const closeBtn = document.getElementById('closeStockModal');
+
+            if (stockCard && modalOverlay && closeBtn) {
+                // Abrir modal
+                stockCard.addEventListener('click', () => {
+                    modalOverlay.style.display = 'flex';
+                    // Pequeño delay para que la transición de opacidad funcione
+                    setTimeout(() => {
+                        modalOverlay.classList.add('active');
+                    }, 10);
+                });
+
+                // Función para cerrar modal
+                const closeModal = () => {
+                    modalOverlay.classList.remove('active');
+                    setTimeout(() => {
+                        modalOverlay.style.display = 'none';
+                    }, 300); // Mismo tiempo que la transición CSS
+                };
+
+                // Cerrar al click en el botón X
+                closeBtn.addEventListener('click', closeModal);
+
+                // Cerrar al click en el fondo oscuro
+                modalOverlay.addEventListener('click', closeModal);
+            }
+        });
+    </script>
 </body>
 
 </html>
