@@ -769,12 +769,24 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="is_active">Estado</label>
-                    <select id="is_active" name="is_active" required>
-                        <option value="1" ${paint && paint.is_active == 1 ? 'selected' : (!paint ? 'selected' : '')}>Activo</option>
-                        <option value="0" ${paint && paint.is_active == 0 ? 'selected' : ''}>Descontinuado</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplier_id">Proveedor (Opcional)</label>
+                        <select id="supplier_id" name="supplier_id">
+                            <option value="">Seleccionar...</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}" ${paint && paint.supplier_id == {{ $supplier->id }} ? 'selected' : ''}>{{ $supplier->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="is_active">Estado</label>
+                        <select id="is_active" name="is_active" required>
+                            <option value="1" ${paint && paint.is_active == 1 ? 'selected' : (!paint ? 'selected' : '')}>Activo</option>
+                            <option value="0" ${paint && paint.is_active == 0 ? 'selected' : ''}>Descontinuado</option>
+                        </select>
+                    </div>
                 </div>
 
                 <button type="submit" class="swal-submit-btn">${paint ? 'Actualizar' : 'Guardar'}</button>

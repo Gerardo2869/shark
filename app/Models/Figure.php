@@ -21,7 +21,13 @@ class Figure extends Model
         'stock',
         'price',
         'is_active',
+        'supplier_id',
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 
     /**
      * Get all of the figure's sale items.

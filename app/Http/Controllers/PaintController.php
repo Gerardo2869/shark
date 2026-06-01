@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paint;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class PaintController extends Controller
@@ -54,7 +55,9 @@ class PaintController extends Controller
         $outOfStockCount = Paint::where('stock', 0)->where('is_active', 1)->count();
         $lowStockCount = Paint::where('stock', '>', 0)->where('stock', '<=', 5)->where('is_active', 1)->count();
 
-        return view('paints.index', compact('paints', 'outOfStockCount', 'lowStockCount'));
+        $suppliers = Supplier::all();
+
+        return view('paints.index', compact('paints', 'outOfStockCount', 'lowStockCount', 'suppliers'));
     }
 
     public function store(Request $request)

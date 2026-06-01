@@ -21,7 +21,13 @@ class Paint extends Model
         'code',
         'ml',
         'is_active',
+        'supplier_id',
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 
     /**
      * Get all of the paint's sale items.

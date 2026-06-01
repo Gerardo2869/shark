@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Figure;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class FigureController extends Controller
@@ -13,17 +14,17 @@ class FigureController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('faction', 'like', "%{$search}%")
-                  ->orWhere('unit_type', 'like', "%{$search}%");
+                    ->orWhere('faction', 'like', "%{$search}%")
+                    ->orWhere('unit_type', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('condition') && $request->input('condition') !== 'all') {
             $query->where('condition', $request->input('condition'));
         }
-        
+
         if ($request->filled('faction') && $request->input('faction') !== 'all') {
             $query->where('faction', $request->input('faction'));
         }
@@ -58,13 +59,15 @@ class FigureController extends Controller
         $outOfStockCount = Figure::where('stock', 0)->where('is_active', 1)->count();
         $lowStockCount = Figure::where('stock', '>', 0)->where('stock', '<=', 2)->where('is_active', 1)->count();
 
-        return view('figures.index', compact('figures', 'outOfStockCount', 'lowStockCount'));
+        $suppliers = Supplier::all();
+
+        return view('figures.index', compact('figures', 'outOfStockCount', 'lowStockCount', 'suppliers'));
     }
 
     public function store(Request $request)
     {
         $data = $request->all();
-        
+
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('figures', 'public');
             $data['image'] = $path;
@@ -78,7 +81,7 @@ class FigureController extends Controller
     public function update(Request $request, Figure $figure)
     {
         $data = $request->all();
-        
+
         if ($request->hasFile('image')) {
             if ($figure->image) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($figure->image);

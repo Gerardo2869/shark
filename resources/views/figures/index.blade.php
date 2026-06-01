@@ -805,10 +805,19 @@
                     </div>
                 </div>
 
-                <div class="form-row">
                     <div class="form-group">
                         <label for="base_size">Tamaño Base (Opcional)</label>
                         <input id="base_size" name="base_size" type="text" placeholder="Ej. 32mm" value="${figure && figure.base_size ? figure.base_size.replace(/"/g, '&quot;') : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="supplier_id">Proveedor (Opcional)</label>
+                        <select id="supplier_id" name="supplier_id">
+                            <option value="">Seleccionar...</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}" ${figure && figure.supplier_id == {{ $supplier->id }} ? 'selected' : ''}>{{ $supplier->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-group">
