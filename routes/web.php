@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/purchase-orders/preview', [\App\Http\Controllers\PurchaseOrderController::class, 'preview'])->name('purchase-orders.preview');
 
     // Write access: admin only
     Route::middleware('is_admin')->group(function () {

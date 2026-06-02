@@ -996,12 +996,15 @@
                             <li class="critical-item">
                                 <div class="critical-item-info">
                                     <span class="critical-item-name">{{ $item['name'] }}</span>
-                                    <span class="critical-item-type">{{ $item['tipo'] }}</span>
+                                    <span class="critical-item-type">{{ $item['tipo'] }} | Proveedor: {{ $item['proveedor'] }}</span>
                                 </div>
                                 <span class="critical-item-stock">{{ $item['stock'] }} en stock</span>
                             </li>
                         @endforeach
                     </ul>
+                    <div style="margin-top: 24px; text-align: center;">
+                        <a href="{{ route('purchase-orders.preview') }}" style="display: inline-block; padding: 12px 24px; background-color: var(--primary-color); color: white; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 15px; transition: var(--transition); width: 100%; box-sizing: border-box;">Generar Órdenes de Compra</a>
+                    </div>
                 @else
                     <div style="text-align: center; color: var(--text-muted); padding: 20px 0;">
                         <svg style="margin-bottom: 12px; color: #34c759;" xmlns="http://www.w3.org/2000/svg" width="48"

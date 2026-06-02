@@ -101,25 +101,27 @@ class DashboardController extends Controller
     private function listaStockCritico()
     {
         return cache()->remember('lista_stock_critico', 300, function () {
-            $figuras = Figure::where('stock', '<', self::STOCK_CRITICO_UMBRAL)
-                ->select('name', 'stock')
+            $figuras = Figure::with('supplier')->where('stock', '<', self::STOCK_CRITICO_UMBRAL)
+                ->select('id', 'name', 'stock', 'supplier_id')
                 ->get()
                 ->map(function ($item) {
                     return [
                         'name' => $item->name,
                         'stock' => $item->stock,
-                        'tipo' => 'Figura'
+                        'tipo' => 'Figura',
+                        'proveedor' => $item->supplier ? $item->supplier->name : 'Sin Proveedor'
                     ];
                 });
 
-            $pinturas = Paint::where('stock', '<', self::STOCK_CRITICO_UMBRAL)
-                ->select('name', 'stock')
+            $pinturas = Paint::with('supplier')->where('stock', '<', self::STOCK_CRITICO_UMBRAL)
+                ->select('id', 'name', 'stock', 'supplier_id')
                 ->get()
                 ->map(function ($item) {
                     return [
                         'name' => $item->name,
                         'stock' => $item->stock,
-                        'tipo' => 'Pintura'
+                        'tipo' => 'Pintura',
+                        'proveedor' => $item->supplier ? $item->supplier->name : 'Sin Proveedor'
                     ];
                 });
 
