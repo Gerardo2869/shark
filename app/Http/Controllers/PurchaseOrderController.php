@@ -39,4 +39,43 @@ class PurchaseOrderController extends Controller
 
         return view('purchase_orders.preview', compact('groupedBySupplier'));
     }
+
+    public function downloadPdf($supplierName)
+    {
+        $umbral = DashboardController::STOCK_CRITICO_UMBRAL;
+
+        $figuras = Figure::with('supplier')->where('stock', '<', $umbral)->get();
+        $pinturas = Paint::with('supplier')->where('stock', '<', $umbral)->get();
+
+        $criticalProducts = collect();
+
+        foreach ($figuras as $figura) {
+            $supplier = $figura->supplier ? $figura->supplier->name : 'Sin Proveedor';
+            if ($supplier === $supplierName) {
+                $criticalProducts->push([
+                    'name' => $figura->name,
+                    'stock' => $figura->stock,
+                    'type' => 'Figura',
+                ]);
+            }
+        }
+
+        foreach ($pinturas as $pintura) {
+            $supplier = $pintura->supplier ? $pintura->supplier->name : 'Sin Proveedor';
+            if ($supplier === $supplierName) {
+                $criticalProducts->push([
+                    'name' => $pintura->name,
+                    'stock' => $pintura->stock,
+                    'type' => 'Pintura',
+                ]);
+            }
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('purchase_orders.pdf', [
+            'supplierName' => $supplierName,
+            'items' => $criticalProducts
+        ]);
+
+        return $pdf->download("orden_compra_{$supplierName}.pdf");
+    }
 }
