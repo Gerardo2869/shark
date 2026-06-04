@@ -105,8 +105,35 @@
             display: flex;
         }
 
-        .download-btn {
+        .action-buttons {
             margin-left: auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .config-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .config-btn:hover {
+            background-color: var(--bg-color);
+            transform: translateY(-1px);
+        }
+
+        .download-btn {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -122,6 +149,25 @@
 
         .download-btn:hover {
             background-color: #005bb5;
+            transform: translateY(-1px);
+        }
+
+        .send-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #34c759;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .send-btn:hover {
+            background-color: #248a3d;
             transform: translateY(-1px);
         }
 
@@ -166,6 +212,113 @@
             border-radius: 8px;
         }
 
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-cancel {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 16px;
+        }
+
+        .btn-save {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 20px;
+            transition: var(--transition);
+        }
+
+        .btn-save:hover {
+            background-color: #005bb5;
+        }
+
     </style>
 </head>
 <body>
@@ -180,6 +333,17 @@
             </a>
         </header>
 
+        @if(session('success'))
+            <div style="background-color: rgba(52, 199, 89, 0.1); color: #248a3d; padding: 16px 24px; border-radius: 16px; margin-bottom: 32px; font-weight: 500; border: 1px solid rgba(52, 199, 89, 0.2);">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div style="background-color: rgba(255, 59, 48, 0.1); color: #c93429; padding: 16px 24px; border-radius: 16px; margin-bottom: 32px; font-weight: 500; border: 1px solid rgba(255, 59, 48, 0.2);">
+                {{ session('error') }}
+            </div>
+        @endif
+
 
         @forelse($groupedBySupplier as $supplierName => $items)
             <div class="supplier-group">
@@ -192,15 +356,32 @@
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                         </svg>
                     </div>
-                    <span>Para {{ $supplierName }} necesitamos:</span>
-                    <a href="{{ route('purchase-orders.download', $supplierName) }}" class="download-btn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Descargar PDF
-                    </a>
+                    <div class="action-buttons">
+                        @if(isset($suppliers[$supplierName]))
+                        <button type="button" class="config-btn" onclick="openEmailModal({{ $suppliers[$supplierName]->id }}, '{{ $suppliers[$supplierName]->name }}', '{{ $suppliers[$supplierName]->email }}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            {{ $suppliers[$supplierName]->email ? 'Editar Correo' : 'Configurar Correo' }}
+                        </button>
+                        @endif
+                        <a href="{{ route('purchase-orders.send-email', $supplierName) }}" class="send-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                            Enviar Correo
+                        </a>
+                        <a href="{{ route('purchase-orders.download', $supplierName) }}" class="download-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Descargar PDF
+                        </a>
+                    </div>
                 </h2>
                 
                 <table class="items-table">
@@ -239,5 +420,47 @@
             </div>
         @endforelse
     </div>
+
+    <!-- Email Modal -->
+    <div class="modal-overlay" id="emailModal" onclick="closeEmailModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 class="modal-title" id="emailModalTitle">Configurar Correo</h3>
+            <form id="emailForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="form-group">
+                    <label for="supplierEmail">Correo Electrónico</label>
+                    <input type="email" name="email" id="supplierEmail" placeholder="ejemplo@proveedor.com" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeEmailModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEmailModal(id, name, email) {
+            document.getElementById('emailModalTitle').innerText = 'Correo de ' + name;
+            document.getElementById('supplierEmail').value = email || '';
+            document.getElementById('emailForm').action = '/suppliers/' + id + '/email';
+            
+            const modal = document.getElementById('emailModal');
+            modal.style.display = 'flex';
+            // Force reflow
+            void modal.offsetWidth;
+            modal.classList.add('active');
+        }
+
+        function closeEmailModal(event) {
+            if (event && event.target !== document.getElementById('emailModal')) return;
+            const modal = document.getElementById('emailModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    </script>
 </body>
 </html>

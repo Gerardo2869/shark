@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/purchase-orders/preview', [\App\Http\Controllers\PurchaseOrderController::class, 'preview'])->name('purchase-orders.preview');
     Route::get('/purchase-orders/download/{supplier}', [\App\Http\Controllers\PurchaseOrderController::class, 'downloadPdf'])->name('purchase-orders.download');
+    Route::get('/purchase-orders/send-email/{supplier}', [\App\Http\Controllers\PurchaseOrderController::class, 'sendEmail'])->name('purchase-orders.send-email');
+    Route::put('/suppliers/{supplier}/email', [\App\Http\Controllers\SupplierController::class, 'updateEmail'])->name('suppliers.updateEmail');
 
     // Write access: admin only
     Route::middleware('is_admin')->group(function () {
