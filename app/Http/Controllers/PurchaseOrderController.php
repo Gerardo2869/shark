@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Figure;
 use App\Models\Paint;
+use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderController extends Controller
 {
@@ -77,6 +79,16 @@ class PurchaseOrderController extends Controller
             'items' => $criticalProducts
         ]);
 
+        $supplierModel = \App\Models\Supplier::where('name', $supplierName)->first();
+        if ($supplierModel) {
+            PurchaseOrder::create([
+                'supplier_id' => $supplierModel->id,
+                'user_id' => Auth::id(),
+                'status' => 'pendiente',
+                'details' => $criticalProducts->toArray(),
+            ]);
+        }
+
         return $pdf->download("orden_compra_{$supplierName}.pdf");
     }
 
@@ -120,9 +132,29 @@ class PurchaseOrderController extends Controller
 
         if ($supplier && $supplier->email) {
             \Illuminate\Support\Facades\Mail::to($supplier->email)->send(new \App\Mail\PurchaseOrderMail($pdf->output(), $supplierName));
+            
+            PurchaseOrder::create([
+                'supplier_id' => $supplier->id,
+                'user_id' => Auth::id(),
+                'status' => 'pendiente',
+                'details' => $criticalProducts->toArray(),
+            ]);
+
             return redirect()->back()->with('success', "Correo enviado a {$supplierName} con éxito.");
         }
 
         return redirect()->back()->with('error', "El proveedor {$supplierName} no tiene correo registrado.");
+    }
+
+    public function history()
+    {
+        $orders = PurchaseOrder::with(['supplier', 'user'])->orderBy('created_at', 'desc')->get();
+        return view('purchase_orders.history', compact('orders'));
+    }
+
+    public function markAsReceived(PurchaseOrder $purchaseOrder)
+    {
+        $purchaseOrder->update(['status' => 'recibida']);
+        return redirect()->back()->with('success', 'Orden marcada como recibida.');
     }
 }
