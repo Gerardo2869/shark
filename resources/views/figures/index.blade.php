@@ -41,6 +41,7 @@
             justify-content: center;
             transition: var(--transition);
         }
+
         .theme-toggle-admin:hover {
             background-color: rgba(128, 128, 128, 0.1);
         }
@@ -459,30 +460,42 @@
                     <button type="button" class="add-btn" onclick="openCreateModal()"
                         style="border: none; cursor: pointer;">Nueva Figura</button>
                 @endif
-                <a href="{{ route('profile.edit') }}" class="edit-btn" style="border: none; cursor: pointer; color: var(--text-color);">Mi Perfil</a>
-                
-            <button type="button" class="theme-toggle-admin" onclick="window.toggleTheme()" aria-label="Cambiar tema">
-                <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg id="moonIcon" style="display:none;" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
+                <a href="{{ route('figures.pdf', request()->query()) }}" class="add-btn"
+                    style="background-color: #34c759; border: none; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>PDF
+                </a>
+                <a href="{{ route('profile.edit') }}" class="edit-btn"
+                    style="border: none; cursor: pointer; color: var(--text-color);">Mi Perfil</a>
+
+                <button type="button" class="theme-toggle-admin" onclick="window.toggleTheme()"
+                    aria-label="Cambiar tema">
+                    <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg id="moonIcon" style="display:none;" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
 
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar Sesión</button>
+                    <button type="submit" class="edit-btn" style="border: none; cursor: pointer; color: #d93d3b;">Cerrar
+                        Sesión</button>
                 </form>
             </div>
         </div>
@@ -918,14 +931,14 @@
         document.addEventListener("DOMContentLoaded", function () {
             const htmlElement = document.documentElement;
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            
+
             function setTheme(theme) {
                 htmlElement.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
-                
+
                 const sunIcon = document.getElementById('sunIcon');
                 const moonIcon = document.getElementById('moonIcon');
-                
+
                 if (sunIcon && moonIcon) {
                     if (theme === 'dark') {
                         sunIcon.style.display = 'none';
@@ -936,11 +949,11 @@
                     }
                 }
             }
-            
+
             setTheme(savedTheme);
-            
+
             // Allow toggle clicks from a button
-            window.toggleTheme = function() {
+            window.toggleTheme = function () {
                 const currentTheme = htmlElement.getAttribute('data-theme');
                 setTheme(currentTheme === 'dark' ? 'light' : 'dark');
             };

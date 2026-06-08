@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
     // Read access: auth users
     Route::get('/paints', [PaintController::class, 'index'])->name('paints.index');
     Route::get('/figures', [FigureController::class, 'index'])->name('figures.index');
+    Route::get('/figures/pdf', [FigureController::class, 'downloadPdf'])->name('figures.pdf');
 
     // Sales
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
