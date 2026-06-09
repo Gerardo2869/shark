@@ -23,6 +23,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     // Read access: auth users
     Route::get('/paints', [PaintController::class, 'index'])->name('paints.index');
+    Route::get('/paints/pdf', [PaintController::class, 'downloadPdf'])->name('paints.pdf');
     Route::get('/figures', [FigureController::class, 'index'])->name('figures.index');
     Route::get('/figures/pdf', [FigureController::class, 'downloadPdf'])->name('figures.pdf');
 
@@ -50,16 +51,17 @@ Route::middleware('auth')->group(function () {
 
     // Write access: admin only
     Route::middleware('is_admin')->group(function () {
-        
+
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
         Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
         Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
-        
+
         // Audit Logs
         Route::get('/audit', [\App\Http\Controllers\AuditController::class, 'index'])->name('audit.index');
 
         // Bundles
+        Route::get('/bundles/pdf', [BundleController::class, 'downloadPdf'])->name('bundles.pdf');
         Route::resource('bundles', BundleController::class);
 
         Route::post('/paints', [PaintController::class, 'store']);

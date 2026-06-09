@@ -70,4 +70,15 @@ class BundleController extends Controller
         $bundle->delete();
         return redirect()->route('bundles.index')->with('success', 'Paquete eliminado exitosamente.');
     }
+
+    public function downloadPdf()
+    {
+        $bundles = Bundle::with('items.sellable')->orderBy('created_at', 'desc')->get();
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('bundles.pdf', [
+            'bundles' => $bundles
+        ]);
+
+        return $pdf->download("catalogo_paquetes.pdf");
+    }
 }
