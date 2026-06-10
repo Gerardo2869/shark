@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/paints/pdf', [PaintController::class, 'downloadPdf'])->name('paints.pdf');
     Route::get('/figures', [FigureController::class, 'index'])->name('figures.index');
     Route::get('/figures/pdf', [FigureController::class, 'downloadPdf'])->name('figures.pdf');
+    Route::get('/figures/csv', [FigureController::class, 'downloadCsv'])->name('figures.csv');
 
     // Sales
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
